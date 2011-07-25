@@ -1,13 +1,13 @@
 name:          either
 category:      Control, Monads
-version:       0.2.2
+version:       0.2.2.1
 license:       BSD3
 cabal-version: >= 1.6
 license-file:  LICENSE
 author:        Edward A. Kmett
 maintainer:    Edward A. Kmett <ekmett@gmail.com>
 stability:     provisional
-homepage:      git://github.com/ekmett/either/
+homepage:      http://github.com/ekmett/either/
 copyright:     Copyright (C) 2008-2011 Edward A. Kmett
 synopsis:      Haskell 98 either monad transformer
 description:   Haskell 98 either monad transformer
@@ -19,7 +19,7 @@ source-repository head
 
 library
   build-depends: 
-    base >= 4 && < 4.4,
+    base >= 4 && < 5,
     data-default >= 0.2.0.1 && < 0.3,
     semigroups >= 0.5 && < 0.6,
     semigroupoids >= 1.2.1 && < 1.3,
