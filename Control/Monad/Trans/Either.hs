@@ -12,7 +12,6 @@ import Data.Functor.Plus
 import Data.Foldable
 import Data.Function (on)
 import Data.Traversable
-import Data.Monoid
 import Data.Semigroup
 import Control.Monad.Trans.Class
 -- import Control.Monad.Error.Class
