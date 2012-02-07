@@ -2,6 +2,7 @@
 module Control.Monad.Trans.Either 
   ( EitherT(..)
   , eitherT
+  , leftT
   , hoistEither
   ) where
 
@@ -18,6 +19,7 @@ import Control.Monad.Trans.Class
 import Control.Monad.IO.Class
 import Control.Monad.Fix
 import Control.Monad (MonadPlus(..), liftM)
+import Control.Arrow (left)
 
 newtype EitherT e m a = EitherT { runEitherT :: m (Either e a) }
 -- TODO: Data, Typeable
@@ -45,6 +47,9 @@ eitherT f g (EitherT m) = m >>= \z -> case z of
 
 hoistEither :: Monad m => Either e a -> EitherT e m a
 hoistEither = EitherT . return
+
+leftT :: Monad m => (e -> e1) -> EitherT e m a -> EitherT e1 m a
+leftT f = EitherT . liftM (left f) . runEitherT
 
 instance Functor m => Functor (EitherT e m) where
   fmap f = EitherT . fmap (fmap f) . runEitherT 
