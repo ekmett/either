@@ -1,12 +1,11 @@
 {-# LANGUAGE FlexibleInstances, FlexibleContexts, UndecidableInstances #-}
-module Control.Monad.Trans.Either 
+module Control.Monad.Trans.Either
   ( EitherT(..)
   , eitherT
   , hoistEither
   ) where
 
 import Control.Applicative
-import Data.Default
 import Data.Functor.Bind
 import Data.Functor.Plus
 import Data.Foldable
@@ -17,7 +16,7 @@ import Control.Monad.Trans.Class
 -- import Control.Monad.Error.Class
 import Control.Monad.IO.Class
 import Control.Monad.Fix
-import Control.Monad (MonadPlus(..), liftM)
+import Control.Monad (liftM)
 
 newtype EitherT e m a = EitherT { runEitherT :: m (Either e a) }
 -- TODO: Data, Typeable
@@ -27,8 +26,8 @@ instance Show (m (Either e a)) => Show (EitherT e m a) where
     showString "EitherT " . showsPrec 11 m
 
 instance Read (m (Either e a)) => Read (EitherT e m a) where
-  readsPrec d r = readParen (d > 10) 
-    (\r' -> [ (EitherT m, t) 
+  readsPrec d r = readParen (d > 10)
+    (\r' -> [ (EitherT m, t)
             | ("EitherT", s) <- lex r'
             , (m, t) <- readsPrec 11 s]) r
 
@@ -47,12 +46,12 @@ hoistEither :: Monad m => Either e a -> EitherT e m a
 hoistEither = EitherT . return
 
 instance Functor m => Functor (EitherT e m) where
-  fmap f = EitherT . fmap (fmap f) . runEitherT 
+  fmap f = EitherT . fmap (fmap f) . runEitherT
 
 instance (Functor m, Monad m) => Apply (EitherT e m) where
   EitherT f <.> EitherT v = EitherT $ f >>= \mf -> case mf of
     Left  e -> return (Left e)
-    Right k -> v >>= \mv -> case mv of 
+    Right k -> v >>= \mv -> case mv of
       Left  e -> return (Left e)
       Right x -> return (Right (k x))
 
@@ -60,28 +59,17 @@ instance (Functor m, Monad m) => Applicative (EitherT e m) where
   pure a  = EitherT $ return (Right a)
   EitherT f <*> EitherT v = EitherT $ f >>= \mf -> case mf of
     Left  e -> return (Left e)
-    Right k -> v >>= \mv -> case mv of 
+    Right k -> v >>= \mv -> case mv of
       Left  e -> return (Left e)
       Right x -> return (Right (k x))
 
 instance Monad m => Semigroup (EitherT e m a) where
   EitherT m <> EitherT n = EitherT $ m >>= \a -> case a of
-    Left _ -> n 
+    Left _ -> n
     Right r -> return (Right r)
-
-instance (Monad m, Default e) => Monoid (EitherT e m a) where
-  mappend = (<>)
-  mempty = EitherT $ return $ Left def
 
 instance (Functor m, Monad m) => Alt (EitherT e m) where
   (<!>) = (<>)
-
-instance (Functor m, Monad m, Default e) => Plus (EitherT e m) where
-  zero = EitherT $ return $ Left def
-
-instance (Functor m, Monad m, Default e) => Alternative (EitherT e m) where
-  empty = zero
-  (<|>) = (<!>)
 
 instance (Functor m, Monad m) => Bind (EitherT e m) where
   (>>-) = (>>=)
@@ -102,12 +90,6 @@ instance Monad m => MonadError e (EitherT e m) where
     Right r -> return (Right r)
 -}
 
-instance (Monad m, Default e) => MonadPlus (EitherT e m) where
-  mzero = EitherT $ return $ Left def
-  EitherT m `mplus` EitherT n = EitherT $ m >>= \a -> case a of
-    Left  _ -> n
-    Right r -> return (Right r)
-
 instance MonadFix m => MonadFix (EitherT e m) where
   mfix f = EitherT $ mfix $ \a -> runEitherT $ f $ case a of
     Right r -> r
@@ -122,6 +104,6 @@ instance MonadIO m => MonadIO (EitherT e m) where
 instance Foldable m => Foldable (EitherT e m) where
   foldMap f = foldMap (either mempty f) . runEitherT
 
-instance (Traversable f) => Traversable (EitherT e f) where 
-  traverse f (EitherT a) = 
-    EitherT <$> traverse (either (pure . Left) (fmap Right . f)) a 
+instance (Traversable f) => Traversable (EitherT e f) where
+  traverse f (EitherT a) =
+    EitherT <$> traverse (either (pure . Left) (fmap Right . f)) a
