@@ -8,10 +8,12 @@ author:        Edward A. Kmett
 maintainer:    Edward A. Kmett <ekmett@gmail.com>
 stability:     provisional
 homepage:      http://github.com/ekmett/either/
+bug-reports:   http://github.com/ekmett/either/issues
 copyright:     Copyright (C) 2008-2012 Edward A. Kmett
 synopsis:      Haskell 98 either monad transformer
 description:   Haskell 98 either monad transformer
 build-type:    Simple
+extra-source-files: .travis.yml
 
 source-repository head
   type: git
