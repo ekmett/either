@@ -13,7 +13,7 @@ copyright:     Copyright (C) 2008-2012 Edward A. Kmett
 synopsis:      Haskell 98 either monad transformer
 description:   Haskell 98 either monad transformer
 build-type:    Simple
-extra-source-files: .travis.yml
+extra-source-files: .travis.yml README.markdown
 
 source-repository head
   type: git
