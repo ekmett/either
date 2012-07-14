@@ -2,6 +2,7 @@
 module Control.Monad.Trans.Either
   ( EitherT(..)
   , eitherT
+  , mapEitherT
   , hoistEither
   , left
   , right
@@ -39,10 +40,12 @@ instance Eq (m (Either e a)) => Eq (EitherT e m a) where
 instance Ord (m (Either e a)) => Ord (EitherT e m a) where
   compare = compare `on` runEitherT
 
+
 eitherT :: Monad m => (a -> m c) -> (b -> m c) -> EitherT a m b -> m c
 eitherT f g (EitherT m) = m >>= \z -> case z of
   Left a -> f a
   Right b -> g b
+{-# INLINE eitherT #-}
 
 left :: Monad m => e -> EitherT e m a
 left = EitherT . return . Left
@@ -51,6 +54,13 @@ left = EitherT . return . Left
 right :: Monad m => a -> EitherT e m a
 right = return
 {-# INLINE right #-}
+
+
+mapEitherT :: Functor m => (e -> f) -> (a -> b) -> EitherT e m a -> EitherT f m b
+mapEitherT f g (EitherT m) = EitherT (fmap h m) where
+  h (Left e)  = Left (f e)
+  h (Right a) = Right (g a)
+{-# INLINE mapEitherT #-}
 
 hoistEither :: Monad m => Either e a -> EitherT e m a
 hoistEither = EitherT . return
