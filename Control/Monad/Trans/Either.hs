@@ -3,6 +3,8 @@ module Control.Monad.Trans.Either
   ( EitherT(..)
   , eitherT
   , hoistEither
+  , left
+  , right
   ) where
 
 import Control.Applicative
@@ -42,9 +44,13 @@ eitherT f g (EitherT m) = m >>= \z -> case z of
   Left a -> f a
   Right b -> g b
 
-left :: e -> EitherT e m a
+left :: Monad m => e -> EitherT e m a
 left = EitherT . return . Left
 {-# INLINE left #-}
+
+right :: Monad m => a -> EitherT e m a
+right = return
+{-# INLINE right #-}
 
 hoistEither :: Monad m => Either e a -> EitherT e m a
 hoistEither = EitherT . return
