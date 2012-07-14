@@ -42,8 +42,13 @@ eitherT f g (EitherT m) = m >>= \z -> case z of
   Left a -> f a
   Right b -> g b
 
+left :: e -> EitherT e m a
+left = EitherT . return . Left
+{-# INLINE left #-}
+
 hoistEither :: Monad m => Either e a -> EitherT e m a
 hoistEither = EitherT . return
+{-# INLINE hoistEither #-}
 
 instance Functor m => Functor (EitherT e m) where
   fmap f = EitherT . fmap (fmap f) . runEitherT
