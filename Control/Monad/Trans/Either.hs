@@ -31,10 +31,10 @@ instance Show (m (Either e a)) => Show (EitherT e m a) where
     showString "EitherT " . showsPrec 11 m
 
 instance Read (m (Either e a)) => Read (EitherT e m a) where
-  readsPrec d r = readParen (d > 10)
+  readsPrec d = readParen (d > 10)
     (\r' -> [ (EitherT m, t)
             | ("EitherT", s) <- lex r'
-            , (m, t) <- readsPrec 11 s]) r
+            , (m, t) <- readsPrec 11 s])
 
 instance Eq (m (Either e a)) => Eq (EitherT e m a) where
   (==) = (==) `on` runEitherT
