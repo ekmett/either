@@ -1,4 +1,5 @@
-{-# LANGUAGE FlexibleInstances, FlexibleContexts, UndecidableInstances #-}
+{-# LANGUAGE FlexibleInstances, FlexibleContexts, MultiParamTypeClasses,
+             UndecidableInstances #-}
 module Control.Monad.Trans.Either
   ( EitherT(..)
   , eitherT
@@ -20,6 +21,7 @@ import Control.Monad.Trans.Class
 import Control.Monad.IO.Class
 import Control.Monad.Fix
 import Control.Monad (liftM)
+import Control.Monad.State (MonadState,get,put)
 
 newtype EitherT e m a = EitherT { runEitherT :: m (Either e a) }
 -- TODO: Data, Typeable
@@ -121,6 +123,10 @@ instance MonadTrans (EitherT e) where
 
 instance MonadIO m => MonadIO (EitherT e m) where
   liftIO = lift . liftIO
+
+instance MonadState s m => MonadState s (EitherT e m) where
+  get = lift get
+  put = lift . put
 
 instance Foldable m => Foldable (EitherT e m) where
   foldMap f = foldMap (either mempty f) . runEitherT
