@@ -25,7 +25,8 @@ library
     semigroups    >= 0.8.3.1 && < 0.9,
     semigroupoids >= 3.0     && < 3.1,
     transformers  >= 0.2     && < 0.4,
-    mtl           == 2.1.*
+    mtl           == 2.1.*,
+    MonadRandom   == 0.1.*
 
   extensions: CPP
 

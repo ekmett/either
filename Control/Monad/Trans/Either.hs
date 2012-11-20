@@ -22,6 +22,8 @@ import Control.Monad.IO.Class
 import Control.Monad.Fix
 import Control.Monad (liftM)
 import Control.Monad.State (MonadState,get,put)
+import Control.Monad.Random (MonadRandom,getRandom,getRandoms,
+                             getRandomR,getRandomRs)
 
 newtype EitherT e m a = EitherT { runEitherT :: m (Either e a) }
 -- TODO: Data, Typeable
@@ -127,6 +129,12 @@ instance MonadIO m => MonadIO (EitherT e m) where
 instance MonadState s m => MonadState s (EitherT e m) where
   get = lift get
   put = lift . put
+
+instance MonadRandom m => MonadRandom (EitherT e m) where
+  getRandom   = lift getRandom
+  getRandoms  = lift getRandoms
+  getRandomR  = lift . getRandomR
+  getRandomRs = lift . getRandomRs
 
 instance Foldable m => Foldable (EitherT e m) where
   foldMap f = foldMap (either mempty f) . runEitherT
