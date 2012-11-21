@@ -1,4 +1,5 @@
-{-# LANGUAGE FlexibleInstances, FlexibleContexts, UndecidableInstances #-}
+{-# LANGUAGE FlexibleInstances, FlexibleContexts, MultiParamTypeClasses,
+             UndecidableInstances #-}
 module Control.Monad.Trans.Either
   ( EitherT(..)
   , eitherT
@@ -20,6 +21,9 @@ import Control.Monad.Trans.Class
 import Control.Monad.IO.Class
 import Control.Monad.Fix
 import Control.Monad (liftM)
+import Control.Monad.State (MonadState,get,put)
+import Control.Monad.Random (MonadRandom,getRandom,getRandoms,
+                             getRandomR,getRandomRs)
 
 newtype EitherT e m a = EitherT { runEitherT :: m (Either e a) }
 -- TODO: Data, Typeable
@@ -29,10 +33,10 @@ instance Show (m (Either e a)) => Show (EitherT e m a) where
     showString "EitherT " . showsPrec 11 m
 
 instance Read (m (Either e a)) => Read (EitherT e m a) where
-  readsPrec d r = readParen (d > 10)
+  readsPrec d = readParen (d > 10)
     (\r' -> [ (EitherT m, t)
             | ("EitherT", s) <- lex r'
-            , (m, t) <- readsPrec 11 s]) r
+            , (m, t) <- readsPrec 11 s])
 
 instance Eq (m (Either e a)) => Eq (EitherT e m a) where
   (==) = (==) `on` runEitherT
@@ -121,6 +125,16 @@ instance MonadTrans (EitherT e) where
 
 instance MonadIO m => MonadIO (EitherT e m) where
   liftIO = lift . liftIO
+
+instance MonadState s m => MonadState s (EitherT e m) where
+  get = lift get
+  put = lift . put
+
+instance MonadRandom m => MonadRandom (EitherT e m) where
+  getRandom   = lift getRandom
+  getRandoms  = lift getRandoms
+  getRandomR  = lift . getRandomR
+  getRandomRs = lift . getRandomRs
 
 instance Foldable m => Foldable (EitherT e m) where
   foldMap f = foldMap (either mempty f) . runEitherT
