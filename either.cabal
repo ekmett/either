@@ -1,6 +1,6 @@
 name:          either
 category:      Control, Monads
-version:       3.0.2
+version:       3.0.3
 license:       BSD3
 cabal-version: >= 1.6
 license-file:  LICENSE
@@ -13,7 +13,13 @@ copyright:     Copyright (C) 2008-2012 Edward A. Kmett
 synopsis:      Haskell 98 either monad transformer
 description:   Haskell 98 either monad transformer
 build-type:    Simple
-extra-source-files: .travis.yml README.markdown
+extra-source-files:
+  .gitignore
+  .ghci
+  .vim.custom
+  .travis.yml
+  CHANGELOG.markdown
+  README.markdown
 
 source-repository head
   type: git
@@ -22,8 +28,8 @@ source-repository head
 library
   build-depends:
     base          >= 4       && < 5,
-    semigroups    >= 0.8.3.1 && < 0.9,
-    semigroupoids >= 3.0     && < 3.1,
+    semigroups    >= 0.8.3.1,
+    semigroupoids >= 3,
     transformers  >= 0.2     && < 0.4
 
   extensions: CPP
@@ -32,3 +38,4 @@ library
     Control.Monad.Trans.Either
 
   ghc-options:      -Wall
+  hs-source-dirs: src
