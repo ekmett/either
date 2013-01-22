@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleInstances, FlexibleContexts, UndecidableInstances #-}
+{-# LANGUAGE FlexibleInstances, FlexibleContexts, UndecidableInstances, FunctionalDependencies #-}
 module Control.Monad.Trans.Either
   ( EitherT(..)
   , eitherT
@@ -16,7 +16,7 @@ import Data.Function (on)
 import Data.Traversable
 import Data.Semigroup
 import Control.Monad.Trans.Class
--- import Control.Monad.Error.Class
+import Control.Monad.Error.Class
 import Control.Monad.IO.Class
 import Control.Monad.Fix
 import Control.Monad (liftM)
@@ -47,11 +47,11 @@ eitherT f g (EitherT m) = m >>= \z -> case z of
   Right b -> g b
 {-# INLINE eitherT #-}
 
-left :: Monad m => e -> EitherT e m a
-left = EitherT . return . Left
+left :: MonadError e m => e -> m a
+left = throwError
 {-# INLINE left #-}
 
-right :: Monad m => a -> EitherT e m a
+right :: MonadError e m => a -> m a
 right = return
 {-# INLINE right #-}
 
@@ -62,8 +62,9 @@ mapEitherT f g (EitherT m) = EitherT (fmap h m) where
   h (Right a) = Right (g a)
 {-# INLINE mapEitherT #-}
 
-hoistEither :: Monad m => Either e a -> EitherT e m a
-hoistEither = EitherT . return
+hoistEither :: MonadError e m => Either e a -> m a
+hoistEither (Left a)  = throwError a
+hoistEither (Right e) = return e
 {-# INLINE hoistEither #-}
 
 instance Functor m => Functor (EitherT e m) where
@@ -103,13 +104,13 @@ instance Monad m => Monad (EitherT e m) where
       Left  l -> return (Left l)
       Right r -> runEitherT (k r)
 
-{-
 instance Monad m => MonadError e (EitherT e m) where
   throwError = EitherT . return . Left
   EitherT m `catchError` h = EitherT $ m >>= \a -> case a of
-    Left  l -> runEitherT (h l)
-    Right r -> return (Right r)
--}
+    Left  l     -> runEitherT (h l)
+    r@(Right _) -> return r
+  {-# INLINE throwError #-}
+  {-# INLINE catchError #-}
 
 instance MonadFix m => MonadFix (EitherT e m) where
   mfix f = EitherT $ mfix $ \a -> runEitherT $ f $ case a of
