@@ -14,6 +14,7 @@ module Control.Monad.Trans.Either
 
 import Control.Applicative
 import Control.Monad (liftM)
+import Control.Monad.Cont.Class
 import Control.Monad.Error.Class
 import Control.Monad.Fix
 import Control.Monad.IO.Class
@@ -51,26 +52,32 @@ instance Ord (m (Either e a)) => Ord (EitherT e m a) where
   compare = compare `on` runEitherT
   {-# INLINE compare #-}
 
+-- | Given a pair of actions, one to perform in case of failure, and one to perform
+-- in case of success, run an 'EitherT' and get back a monadic result.
 eitherT :: Monad m => (a -> m c) -> (b -> m c) -> EitherT a m b -> m c
 eitherT f g (EitherT m) = m >>= \z -> case z of
   Left a -> f a
   Right b -> g b
 {-# INLINE eitherT #-}
 
+-- | Analogous to 'Left'. Equivalent to 'throwError'.
 left :: Monad m => e -> EitherT e m a
 left = EitherT . return . Left
 {-# INLINE left #-}
 
+-- | Analogous to 'Right'. Equivalent to 'return'.
 right :: Monad m => a -> EitherT e m a
 right = return
 {-# INLINE right #-}
 
+-- | Map over both failure and success.
 bimapEitherT :: Functor m => (e -> f) -> (a -> b) -> EitherT e m a -> EitherT f m b
 bimapEitherT f g (EitherT m) = EitherT (fmap h m) where
   h (Left e)  = Left (f e)
   h (Right a) = Right (g a)
 {-# INLINE bimapEitherT #-}
 
+-- | Lift an 'Either' into an 'EitherT'
 hoistEither :: Monad m => Either e a -> EitherT e m a
 hoistEither = EitherT . return
 {-# INLINE hoistEither #-}
@@ -143,6 +150,12 @@ instance MonadIO m => MonadIO (EitherT e m) where
   liftIO = lift . liftIO
   {-# INLINE liftIO #-}
 
+instance MonadCont m => MonadCont (EitherT e m) where
+  callCC f = EitherT $
+    callCC $ \c ->
+    runEitherT (f (\a -> EitherT $ c (Right a)))
+  {-# INLINE callCC #-}
+
 instance MonadReader r m => MonadReader r (EitherT e m) where
   ask = lift ask
   {-# INLINE ask #-}
@@ -171,19 +184,28 @@ instance MonadWriter s m => MonadWriter s (EitherT e m) where
 
 -- | Map the unwrapped computation using the given function.
 --
--- * @'runEitherT' ('mapEitherT' f m) = f ('runEitherT' m@)
+-- @
+-- 'runEitherT' ('mapEitherT' f m) = f ('runEitherT' m)
+-- @
 mapEitherT :: (m (Either e a) -> n (Either e' b)) -> EitherT e m a -> EitherT e' n b
 mapEitherT f m = EitherT $ f (runEitherT m)
+{-# INLINE mapEitherT #-}
 
 instance MonadRandom m => MonadRandom (EitherT e m) where
   getRandom   = lift getRandom
+  {-# INLINE getRandom #-}
   getRandoms  = lift getRandoms
+  {-# INLINE getRandoms #-}
   getRandomR  = lift . getRandomR
+  {-# INLINE getRandomR #-}
   getRandomRs = lift . getRandomRs
+  {-# INLINE getRandomRs #-}
 
 instance Foldable m => Foldable (EitherT e m) where
   foldMap f = foldMap (either mempty f) . runEitherT
+  {-# INLINE foldMap #-}
 
 instance Traversable f => Traversable (EitherT e f) where
   traverse f (EitherT a) =
     EitherT <$> traverse (either (pure . Left) (fmap Right . f)) a
+  {-# INLINE traverse #-}
