@@ -2,6 +2,19 @@
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE UndecidableInstances  #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Control.Monad.Trans.Either
+-- Copyright   :  (C) 2008-2013 Edward Kmett
+-- License     :  BSD-style (see the file LICENSE)
+--
+-- Maintainer  :  Edward Kmett <ekmett@gmail.com>
+-- Stability   :  provisional
+-- Portability :  MPTCs
+--
+-- This module provides a minimalist 'Either' monad transformer.
+-----------------------------------------------------------------------------
+
 module Control.Monad.Trans.Either
   ( EitherT(..)
   , eitherT
@@ -30,6 +43,19 @@ import Data.Functor.Plus
 import Data.Traversable
 import Data.Semigroup
 
+-- | 'EitherT' is a version of 'Control.Monad.Trans.Error.ErrorT' that does not
+-- require a spurious 'Control.Monad.Error.Class.Error' instance for the 'Left'
+-- case.
+--
+-- 'Either' is a perfectly usable 'Monad' without such a constraint. 'ErrorT' is
+-- not the generalization of the current 'Either' monad, it is something else.
+--
+-- This is necessary for both theoretical and practical reasons. For instance an
+-- apomorphism is the generalized anamorphism for this Monad, but it cannot be
+-- written with 'ErrorT'.
+--
+-- In addition to the combinators here, the @errors@ package provides a large 
+-- number of combinators for working with this type.
 newtype EitherT e m a = EitherT { runEitherT :: m (Either e a) }
 
 instance Show (m (Either e a)) => Show (EitherT e m a) where
@@ -76,6 +102,15 @@ bimapEitherT f g (EitherT m) = EitherT (fmap h m) where
   h (Left e)  = Left (f e)
   h (Right a) = Right (g a)
 {-# INLINE bimapEitherT #-}
+
+-- | Map the unwrapped computation using the given function.
+--
+-- @
+-- 'runEitherT' ('mapEitherT' f m) = f ('runEitherT' m)
+-- @
+mapEitherT :: (m (Either e a) -> n (Either e' b)) -> EitherT e m a -> EitherT e' n b
+mapEitherT f m = EitherT $ f (runEitherT m)
+{-# INLINE mapEitherT #-}
 
 -- | Lift an 'Either' into an 'EitherT'
 hoistEither :: Monad m => Either e a -> EitherT e m a
@@ -181,15 +216,6 @@ instance MonadWriter s m => MonadWriter s (EitherT e m) where
         Left  l      -> (Left  l, id)
         Right (r, f) -> (Right r, f)
   {-# INLINE pass #-}
-
--- | Map the unwrapped computation using the given function.
---
--- @
--- 'runEitherT' ('mapEitherT' f m) = f ('runEitherT' m)
--- @
-mapEitherT :: (m (Either e a) -> n (Either e' b)) -> EitherT e m a -> EitherT e' n b
-mapEitherT f m = EitherT $ f (runEitherT m)
-{-# INLINE mapEitherT #-}
 
 instance MonadRandom m => MonadRandom (EitherT e m) where
   getRandom   = lift getRandom
