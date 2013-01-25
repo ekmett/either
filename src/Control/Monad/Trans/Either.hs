@@ -1,4 +1,7 @@
-{-# LANGUAGE FlexibleInstances, FlexibleContexts, UndecidableInstances #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE UndecidableInstances  #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 module Control.Monad.Trans.Either
   ( EitherT(..)
   , eitherT
@@ -15,14 +18,14 @@ import Data.Foldable
 import Data.Function (on)
 import Data.Traversable
 import Data.Semigroup
+
 import Control.Monad.Trans.Class
--- import Control.Monad.Error.Class
+import Control.Monad.Error.Class
 import Control.Monad.IO.Class
 import Control.Monad.Fix
 import Control.Monad (liftM)
 
 newtype EitherT e m a = EitherT { runEitherT :: m (Either e a) }
--- TODO: Data, Typeable
 
 instance Show (m (Either e a)) => Show (EitherT e m a) where
   showsPrec d (EitherT m) = showParen (d > 10) $
@@ -40,7 +43,6 @@ instance Eq (m (Either e a)) => Eq (EitherT e m a) where
 instance Ord (m (Either e a)) => Ord (EitherT e m a) where
   compare = compare `on` runEitherT
 
-
 eitherT :: Monad m => (a -> m c) -> (b -> m c) -> EitherT a m b -> m c
 eitherT f g (EitherT m) = m >>= \z -> case z of
   Left a -> f a
@@ -54,7 +56,6 @@ left = EitherT . return . Left
 right :: Monad m => a -> EitherT e m a
 right = return
 {-# INLINE right #-}
-
 
 mapEitherT :: Functor m => (e -> f) -> (a -> b) -> EitherT e m a -> EitherT f m b
 mapEitherT f g (EitherT m) = EitherT (fmap h m) where
@@ -103,13 +104,11 @@ instance Monad m => Monad (EitherT e m) where
       Left  l -> return (Left l)
       Right r -> runEitherT (k r)
 
-{-
 instance Monad m => MonadError e (EitherT e m) where
   throwError = EitherT . return . Left
   EitherT m `catchError` h = EitherT $ m >>= \a -> case a of
     Left  l -> runEitherT (h l)
     Right r -> return (Right r)
--}
 
 instance MonadFix m => MonadFix (EitherT e m) where
   mfix f = EitherT $ mfix $ \a -> runEitherT $ f $ case a of
@@ -125,6 +124,6 @@ instance MonadIO m => MonadIO (EitherT e m) where
 instance Foldable m => Foldable (EitherT e m) where
   foldMap f = foldMap (either mempty f) . runEitherT
 
-instance (Traversable f) => Traversable (EitherT e f) where
+instance Traversable f => Traversable (EitherT e f) where
   traverse f (EitherT a) =
     EitherT <$> traverse (either (pure . Left) (fmap Right . f)) a
