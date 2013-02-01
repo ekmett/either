@@ -1,3 +1,9 @@
+3.3
+---
+* Inverted roles between `Semigroup` and `Alt`. This let us write `Alternative` and `MonadPlus` instances that are compatible.
+* Removed the `Functor` constraint on most instances in exchange for incurring a `Monad` constraint on `Traversable`. `EitherT`
+  is after all, a `Monad` transformer first and foremost.
+
 3.2
 ---
 * Changed the `Semigroup` to use a `Semigroup` to combine `Left` branches. Left `Alt` untouched, so you can mix and match.

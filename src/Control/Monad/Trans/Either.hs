@@ -26,7 +26,7 @@ module Control.Monad.Trans.Either
   ) where
 
 import Control.Applicative
-import Control.Monad (liftM)
+import Control.Monad (liftM, MonadPlus(..))
 import Control.Monad.Cont.Class
 import Control.Monad.Error.Class
 import Control.Monad.Fix
@@ -117,11 +117,11 @@ hoistEither :: Monad m => Either e a -> EitherT e m a
 hoistEither = EitherT . return
 {-# INLINE hoistEither #-}
 
-instance Functor m => Functor (EitherT e m) where
-  fmap f = EitherT . fmap (fmap f) . runEitherT
+instance Monad m => Functor (EitherT e m) where
+  fmap f = EitherT . liftM (fmap f) . runEitherT
   {-# INLINE fmap #-}
 
-instance (Functor m, Monad m) => Apply (EitherT e m) where
+instance Monad m => Apply (EitherT e m) where
   EitherT f <.> EitherT v = EitherT $ f >>= \mf -> case mf of
     Left  e -> return (Left e)
     Right k -> v >>= \mv -> case mv of
@@ -129,7 +129,7 @@ instance (Functor m, Monad m) => Apply (EitherT e m) where
       Right x -> return (Right (k x))
   {-# INLINE (<.>) #-}
 
-instance (Functor m, Monad m) => Applicative (EitherT e m) where
+instance Monad m => Applicative (EitherT e m) where
   pure a  = EitherT $ return (Right a)
   {-# INLINE pure #-}
   EitherT f <*> EitherT v = EitherT $ f >>= \mf -> case mf of
@@ -139,21 +139,39 @@ instance (Functor m, Monad m) => Applicative (EitherT e m) where
       Right x -> return (Right (k x))
   {-# INLINE (<*>) #-}
 
-instance (Monad m, Semigroup e) => Semigroup (EitherT e m a) where
+instance (Monad m, Monoid e) => Alternative (EitherT e m) where
+  EitherT m <|> EitherT n = EitherT $ m >>= \a -> case a of
+    Left l -> liftM (\b -> case b of
+      Left l' -> Left (mappend l l')
+      Right r -> Right r) n
+    Right r -> return (Right r)
+  {-# INLINE (<|>) #-}
+
+  empty = EitherT $ return (Left mempty)
+  {-# INLINE empty #-}
+
+instance (Monad m, Monoid e) => MonadPlus (EitherT e m) where
+  mplus = (<|>)
+  {-# INLINE mplus #-}
+
+  mzero = empty
+  {-# INLINE mzero #-}
+
+instance Monad m => Semigroup (EitherT e m a) where
   EitherT m <> EitherT n = EitherT $ m >>= \a -> case a of
+    Left _  -> n
+    Right r -> return (Right r)
+  {-# INLINE (<>) #-}
+
+instance (Monad m, Semigroup e) => Alt (EitherT e m) where
+  EitherT m <!> EitherT n = EitherT $ m >>= \a -> case a of
     Left l -> liftM (\b -> case b of
       Left l' -> Left (l <> l')
       Right r -> Right r) n
     Right r -> return (Right r)
-  {-# INLINE (<>) #-}
-
-instance (Functor m, Monad m) => Alt (EitherT e m) where
-  EitherT m <!> EitherT n = EitherT $ m >>= \a -> case a of
-    Left _  -> n
-    Right r -> return (Right r)
   {-# INLINE (<!>) #-}
 
-instance (Functor m, Monad m) => Bind (EitherT e m) where
+instance Monad m => Bind (EitherT e m) where
   (>>-) = (>>=)
   {-# INLINE (>>-) #-}
 
@@ -235,7 +253,7 @@ instance Foldable m => Foldable (EitherT e m) where
   foldMap f = foldMap (either mempty f) . runEitherT
   {-# INLINE foldMap #-}
 
-instance Traversable f => Traversable (EitherT e f) where
+instance (Monad f, Traversable f) => Traversable (EitherT e f) where
   traverse f (EitherT a) =
     EitherT <$> traverse (either (pure . Left) (fmap Right . f)) a
   {-# INLINE traverse #-}
