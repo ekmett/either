@@ -139,14 +139,18 @@ instance (Functor m, Monad m) => Applicative (EitherT e m) where
       Right x -> return (Right (k x))
   {-# INLINE (<*>) #-}
 
-instance Monad m => Semigroup (EitherT e m a) where
+instance (Monad m, Semigroup e) => Semigroup (EitherT e m a) where
   EitherT m <> EitherT n = EitherT $ m >>= \a -> case a of
-    Left _ -> n
+    Left l -> liftM (\b -> case b of
+      Left l' -> Left (l <> l')
+      Right r -> Right r) n
     Right r -> return (Right r)
   {-# INLINE (<>) #-}
 
 instance (Functor m, Monad m) => Alt (EitherT e m) where
-  (<!>) = (<>)
+  EitherT m <!> EitherT n = EitherT $ m >>= \a -> case a of
+    Left _  -> n
+    Right r -> return (Right r)
   {-# INLINE (<!>) #-}
 
 instance (Functor m, Monad m) => Bind (EitherT e m) where
