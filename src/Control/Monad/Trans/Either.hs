@@ -184,6 +184,9 @@ instance Monad m => Monad (EitherT e m) where
       Left  l -> return (Left l)
       Right r -> runEitherT (k r)
   {-# INLINE (>>=) #-}
+  fail = EitherT . fail
+  {-# INLINE fail #-}
+
 
 instance Monad m => MonadError e (EitherT e m) where
   throwError = EitherT . return . Left

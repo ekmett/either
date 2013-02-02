@@ -1,3 +1,7 @@
+3.4
+---
+* Delegate `fail` to the underlying `Monad`, rather than `error`.
+
 3.3
 ---
 * Inverted roles between `Semigroup` and `Alt`. This let us write `Alternative` and `MonadPlus` instances that are compatible.
