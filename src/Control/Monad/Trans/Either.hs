@@ -23,6 +23,13 @@ module Control.Monad.Trans.Either
   , hoistEither
   , left
   , right
+    -- * Related transformers
+    -- $related
+  , HardlyT
+  , found
+  , further
+  , fromMaybeH
+  , runHardlyT
   ) where
 
 import Control.Applicative
@@ -260,3 +267,49 @@ instance (Monad f, Traversable f) => Traversable (EitherT e f) where
   traverse f (EitherT a) =
     EitherT <$> traverse (either (pure . Left) (fmap Right . f)) a
   {-# INLINE traverse #-}
+
+{- $related
+
+   The following transformer uses 'EitherT' to implement specific
+   short-circuiting semantics, relying on the fact that 'EitherT', unlike
+   'ErrorT', does not place an 'Exception' constraint on the short-circuiting
+   value type.
+-}
+
+-- | 'HardlyT' uses 'EitherT' to implement a semantic inverse of the 'MaybeT'
+--    transformer: rather than 'Nothing' values short-circuiting computation
+--    and a final correct result appearing in a 'Just', it it is the 'Just'
+--    values which short-circuit.  The behavior is similar to <|>, but
+--    requires only a Monad interface.
+type HardlyT m a = EitherT a m ()
+
+-- | 'found' indicates that a sought value was found, and the HardlyT monad
+--   should short-circuit with that value wrapped in Just.
+found :: Monad m => a -> HardlyT m a
+found = left
+{-# INLINE found #-}
+
+-- | 'further' is a no-op, but is useful with certain other combinators, for
+--   example, the 'fromMaybeH' function that applies the regular
+--   short-circuiting meaning of Maybe values:
+--
+-- >>> hardlyT $ maybe further found Nothing >> left 10
+-- Just 10
+-- >>> hardlyT $ maybe further found (Just 20) >> left 10
+-- Just 20
+further :: Monad m => HardlyT m a
+further = right ()
+{-# INLINE further #-}
+
+-- | 'fromMaybeH' takes a regular Maybe value, and applies it's
+--   short-circuiting semantics within the HardlyT monad transformer.  This
+--   means that 'Just' value will cause the monad to exit with that value as
+--   the result.
+fromMaybeH :: Monad m => Maybe a -> HardlyT m a
+fromMaybeH = maybe further found
+{-# INLINE fromMaybeH #-}
+
+-- | 'runHardlyT' is the equivalent to 'runEitherT', for the 'HardlyT' monad.
+runHardlyT :: Monad m => HardlyT m a -> m (Maybe a)
+runHardlyT = eitherT (return . Just) (const (return Nothing))
+{-# INLINE runHardlyT #-}
