@@ -35,6 +35,8 @@ library
     transformers  >= 0.2     && < 0.4
 
   extensions: CPP
-  exposed-modules: Control.Monad.Trans.Either
-  ghc-options: -Wall
+  exposed-modules:
+    Control.Monad.Trans.Either,
+    Control.Monad.Trans.Either.Safe
+  ghc-options: -Wall -fno-warn-orphans
   hs-source-dirs: src
