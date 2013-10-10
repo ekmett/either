@@ -141,7 +141,7 @@ mapLeft f = mapBoth f id
 -- 'mapRight' = ('Control.Arrow.right')
 -- @
 --
--- Using 'Control.Lens':
+-- Using @Control.Lens@:
 --
 -- @
 -- 'mapRight' = 'over' '_Right'
