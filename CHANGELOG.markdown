@@ -1,3 +1,7 @@
+3.5
+---
+* Added 'Data.Either.Combinators'.
+
 3.4.1
 -----
 * Trustworthy despite UndecidableInstances
