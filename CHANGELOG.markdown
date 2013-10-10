@@ -1,3 +1,7 @@
+3.4.1
+-----
+* Trustworthy despite UndecidableInstances
+
 3.4
 ---
 * Delegate `fail` to the underlying `Monad`, rather than `error`.
