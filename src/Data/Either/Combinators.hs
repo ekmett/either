@@ -156,7 +156,7 @@ mapRight = mapBoth id
 -- Using @Control.Lens@:
 --
 -- @
--- 'whenLeft' ≡ forMOf_ _Left
+-- 'whenLeft' ≡ forOf_ _Left
 -- @
 whenLeft :: Applicative m => Either a b -> (a -> m ()) -> m ()
 whenLeft (Left x) f = f x
