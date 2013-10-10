@@ -1,6 +1,6 @@
 name:          either
 category:      Control, Monads
-version:       3.4.1
+version:       3.5.0
 license:       BSD3
 cabal-version: >= 1.6
 license-file:  LICENSE
@@ -35,6 +35,7 @@ library
     transformers  >= 0.2     && < 0.4
 
   extensions: CPP
-  exposed-modules: Control.Monad.Trans.Either
+  exposed-modules: Control.Monad.Trans.Either,
+                   Data.Either.Combinators
   ghc-options: -Wall
   hs-source-dirs: src
