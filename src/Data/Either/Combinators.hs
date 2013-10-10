@@ -46,6 +46,12 @@ import Control.Applicative
 -- @
 -- 'isLeft' ≡ has _Left
 -- @
+--
+-- >>> isLeft (Left 12)
+-- True
+--
+-- >>> isLeft (Right 12)
+-- False
 isLeft :: Either a b -> Bool
 isLeft (Left _) = True
 isLeft _        = False
@@ -57,6 +63,12 @@ isLeft _        = False
 -- @
 -- 'isRight' ≡ has _Right
 -- @
+--
+-- >>> isRight (Left 12)
+-- False
+--
+-- >>> isRight (Right 12)
+-- True
 isRight :: Either a b -> Bool
 isRight (Right _) = True
 isRight _         = False
@@ -69,6 +81,9 @@ isRight _         = False
 -- @
 -- 'fromLeft'' x ≡ x^?!_Left
 -- @
+--
+-- >>> fromLeft' (Left 12)
+-- 12
 fromLeft' :: Either a b -> a
 fromLeft' (Right _) = error "Data.Either.Combinators.fromLeft: Argument takes form 'Right _'" -- yuck
 fromLeft' (Left x)  = x
@@ -81,6 +96,9 @@ fromLeft' (Left x)  = x
 -- @
 -- 'fromRight'' x ≡ x^?!_Right
 -- @
+--
+-- >>> fromRight' (Right 12)
+-- 12
 fromRight' :: Either a b -> b
 fromRight' (Left _)  = error "Data.Either.Combinators.fromRight: Argument takes form 'Left _'" -- yuck
 fromRight' (Right x) = x
@@ -99,6 +117,12 @@ fromRight' (Right x) = x
 -- @
 -- 'mapBoth' = ('Control.Arrow.+++')
 -- @
+--
+-- >>> mapBoth (*2) (*3) (Left 4)
+-- Left 8
+--
+-- >>> mapBoth (*2) (*3) (Right 4)
+-- Right 12
 mapBoth :: (a -> c) -> (b -> d) -> Either a b -> Either c d
 mapBoth f _ (Left x)  = Left (f x)
 mapBoth _ f (Right x) = Right (f x)
@@ -123,6 +147,12 @@ mapBoth _ f (Right x) = Right (f x)
 -- @
 -- 'mapLeft' = over _Left
 -- @
+--
+-- >>> mapLeft (*2) (Left 4)
+-- Left 8
+--
+-- >>> mapLeft (*2) (Right "hello")
+-- Right "hello"
 mapLeft :: (a -> c) -> Either a b -> Either c b
 mapLeft f = mapBoth f id
 
@@ -146,6 +176,12 @@ mapLeft f = mapBoth f id
 -- @
 -- 'mapRight' = 'over' '_Right'
 -- @
+--
+-- >>> mapRight (*2) (Left "hello")
+-- Left "hello"
+--
+-- >>> mapRight (*2) (Right 4)
+-- Right 8
 mapRight :: (b -> c) -> Either a b -> Either a c
 mapRight = mapBoth id
 
@@ -158,6 +194,9 @@ mapRight = mapBoth id
 -- @
 -- 'whenLeft' ≡ forOf_ _Left
 -- @
+--
+-- >>> whenLeft (Left 12) print
+-- 12
 whenLeft :: Applicative m => Either a b -> (a -> m ()) -> m ()
 whenLeft (Left x) f = f x
 whenLeft _        _ = pure ()
@@ -177,6 +216,9 @@ whenLeft _        _ = pure ()
 -- @
 -- 'whenRight' ≡ forOf_ _Right
 -- @
+--
+-- >>> whenRight (Right 12) print
+-- 12
 whenRight :: Applicative m => Either a b -> (b -> m ()) -> m ()
 whenRight (Right x) f = f x
 whenRight _         _ = pure ()
@@ -194,6 +236,12 @@ unlessRight = whenLeft
 -- @
 -- 'fromLeft' ≡ 'either' 'id'
 -- @
+--
+-- >>> fromLeft "hello" (Right 42)
+-- "hello"
+--
+-- >>> fromLeft "hello" (Left "world")
+-- "world"
 fromLeft :: a -> Either a b -> a
 fromLeft _ (Left x) = x
 fromLeft x _ = x
@@ -203,6 +251,12 @@ fromLeft x _ = x
 -- @
 -- 'fromRight' b ≡ 'either' b 'id'
 -- @
+--
+-- >>> fromRight "hello" (Right "world")
+-- "world"
+--
+-- >>> fromRight "hello" (Left 42)
+-- "hello"
 fromRight :: b -> Either a b -> b
 fromRight _ (Right x) = x
 fromRight x _ = x
@@ -219,6 +273,12 @@ fromRight x _ = x
 -- 'leftToMaybe' ≡ preview _Left
 -- 'leftToMaybe' x ≡ x^?_Left
 -- @
+--
+-- >>> leftToMaybe (Left 12)
+-- Just 12
+--
+-- >>> leftToMaybe (Right 12)
+-- Nothing
 leftToMaybe :: Either a b -> Maybe a
 leftToMaybe = either Just (const Nothing)
 
@@ -234,5 +294,11 @@ leftToMaybe = either Just (const Nothing)
 -- 'rightToMaybe' ≡ preview _Right
 -- 'rightToMaybe' x ≡ x^?_Right
 -- @
+--
+-- >>> rightToMaybe (Left 12)
+-- Nothing
+--
+-- >>> rightToMaybe (Right 12)
+-- Just 12
 rightToMaybe :: Either a b -> Maybe b
 rightToMaybe = either (const Nothing) Just
