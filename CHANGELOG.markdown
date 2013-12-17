@@ -1,3 +1,7 @@
+4.0
+---
+* Updated dependencies.
+
 3.4.2
 -----
 * Added 'Data.Either.Combinators'.
