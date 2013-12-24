@@ -1,3 +1,7 @@
+4.1
+---
+* Added instances for `MonadBase`, `MonadBaseControl`, and `MonadTransControl`.
+
 4.0
 ---
 * Updated dependencies.
