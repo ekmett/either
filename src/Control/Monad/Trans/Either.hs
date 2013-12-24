@@ -7,6 +7,7 @@
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE UndecidableInstances  #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE TypeFamilies #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Control.Monad.Trans.Either
@@ -32,6 +33,7 @@ module Control.Monad.Trans.Either
 
 import Control.Applicative
 import Control.Monad (liftM, MonadPlus(..))
+import Control.Monad.Base (MonadBase(..), liftBaseDefault)
 import Control.Monad.Cont.Class
 import Control.Monad.Error.Class
 import Control.Monad.Fix
@@ -39,6 +41,7 @@ import Control.Monad.IO.Class
 import Control.Monad.Reader.Class
 import Control.Monad.State (MonadState,get,put)
 import Control.Monad.Trans.Class
+import Control.Monad.Trans.Control (MonadBaseControl(..), MonadTransControl(..), defaultLiftBaseWith, defaultRestoreM)
 import Control.Monad.Writer.Class
 import Control.Monad.Random (MonadRandom,getRandom,getRandoms,getRandomR,getRandomRs)
 import Data.Foldable
@@ -265,3 +268,21 @@ instance (Monad f, Traversable f) => Traversable (EitherT e f) where
   traverse f (EitherT a) =
     EitherT <$> traverse (either (pure . Left) (fmap Right . f)) a
   {-# INLINE traverse #-}
+
+instance (Error e, MonadBase b m) => MonadBase b (EitherT e m) where
+  liftBase = liftBaseDefault
+  {-# INLINE liftBase #-}
+
+instance Error e => MonadTransControl (EitherT e) where
+  newtype StT (EitherT e) a = StEitherT {unStEitherT :: Either e a}
+  liftWith f = EitherT $ liftM return $ f $ liftM StEitherT . runEitherT
+  {-# INLINE liftWith #-}
+  restoreT = EitherT . liftM unStEitherT
+  {-# INLINE restoreT #-}
+
+instance (Error e, MonadBaseControl b m) => MonadBaseControl b (EitherT e m) where
+  newtype StM (EitherT e m) a = StMEitherT { unStMEitherT :: StM m (StT (EitherT e) a) }
+  liftBaseWith = defaultLiftBaseWith StMEitherT
+  {-# INLINE liftBaseWith #-}
+  restoreM     = defaultRestoreM unStMEitherT
+  {-# INLINE restoreM #-}
