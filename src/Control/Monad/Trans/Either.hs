@@ -269,18 +269,18 @@ instance (Monad f, Traversable f) => Traversable (EitherT e f) where
     EitherT <$> traverse (either (pure . Left) (fmap Right . f)) a
   {-# INLINE traverse #-}
 
-instance (Error e, MonadBase b m) => MonadBase b (EitherT e m) where
+instance MonadBase b m => MonadBase b (EitherT e m) where
   liftBase = liftBaseDefault
   {-# INLINE liftBase #-}
 
-instance Error e => MonadTransControl (EitherT e) where
+instance MonadTransControl (EitherT e) where
   newtype StT (EitherT e) a = StEitherT {unStEitherT :: Either e a}
   liftWith f = EitherT $ liftM return $ f $ liftM StEitherT . runEitherT
   {-# INLINE liftWith #-}
   restoreT = EitherT . liftM unStEitherT
   {-# INLINE restoreT #-}
 
-instance (Error e, MonadBaseControl b m) => MonadBaseControl b (EitherT e m) where
+instance MonadBaseControl b m => MonadBaseControl b (EitherT e m) where
   newtype StM (EitherT e m) a = StMEitherT { unStMEitherT :: StM m (StT (EitherT e) a) }
   liftBaseWith = defaultLiftBaseWith StMEitherT
   {-# INLINE liftBaseWith #-}
