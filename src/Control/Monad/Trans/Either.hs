@@ -62,7 +62,7 @@ import Data.Semigroup
 -- apomorphism is the generalized anamorphism for this Monad, but it cannot be
 -- written with 'ErrorT'.
 --
--- In addition to the combinators here, the @errors@ package provides a large 
+-- In addition to the combinators here, the @errors@ package provides a large
 -- number of combinators for working with this type.
 newtype EitherT e m a = EitherT { runEitherT :: m (Either e a) }
 
