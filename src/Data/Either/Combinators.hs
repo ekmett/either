@@ -201,7 +201,7 @@ whenLeft :: Applicative m => Either a b -> (a -> m ()) -> m ()
 whenLeft (Left x) f = f x
 whenLeft _        _ = pure ()
 
--- | The 'whenLeft' function takes an 'Either' value and a function which returns a monad.
+-- | The 'whenRight' function takes an 'Either' value and a function which returns a monad.
 -- The monad is only executed when the given argument takes the form @Right _@, otherwise
 -- it does nothing.
 --
