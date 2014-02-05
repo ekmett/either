@@ -156,13 +156,13 @@ mapBoth _ f (Right x) = Right (f x)
 mapLeft :: (a -> c) -> Either a b -> Either c b
 mapLeft f = mapBoth f id
 
--- | The 'mapLeft' function takes a function and applies it to an Either value
--- iff the value takes the form 'Left _'.
+-- | The 'mapRight' function takes a function and applies it to an Either value
+-- iff the value takes the form 'Right _'.
 --
 -- Using @Data.Bifunctor@:
 --
 -- @
--- 'mapRight' = first
+-- 'mapRight' = second
 -- @
 --
 -- Using @Control.Arrow@:
@@ -174,7 +174,7 @@ mapLeft f = mapBoth f id
 -- Using @Control.Lens@:
 --
 -- @
--- 'mapRight' = 'over' '_Right'
+-- 'mapRight' = over _Right
 -- @
 --
 -- >>> mapRight (*2) (Left "hello")
