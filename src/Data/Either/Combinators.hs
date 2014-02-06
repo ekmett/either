@@ -39,7 +39,7 @@ import Control.Applicative
 -- ---------------------------------------------------------------------------
 -- Functions over Either
 
--- |The 'isLeft' function returns 'True' iff its argument is of the form @Left _@.
+-- |The 'isLeft' function returns 'True' iff its argument is of the form @'Left' _@.
 --
 -- Using @Control.Lens@:
 --
@@ -56,7 +56,7 @@ isLeft :: Either a b -> Bool
 isLeft (Left _) = True
 isLeft _        = False
 
--- |The 'isRight' function returns 'True' iff its argument is of the form @Right _@.
+-- |The 'isRight' function returns 'True' iff its argument is of the form @'Right' _@.
 --
 -- Using @Control.Lens@:
 --
@@ -89,7 +89,7 @@ fromLeft' (Right _) = error "Data.Either.Combinators.fromLeft: Argument takes fo
 fromLeft' (Left x)  = x
 
 -- | Extracts the element out of a 'Right' and
--- throws an error if its argument take the form  @'Left' _@.
+-- throws an error if its argument take the form @'Left' _@.
 --
 -- Using @Control.Lens@:
 --
@@ -128,7 +128,7 @@ mapBoth f _ (Left x)  = Left (f x)
 mapBoth _ f (Right x) = Right (f x)
 
 -- | The 'mapLeft' function takes a function and applies it to an Either value
--- iff the value takes the form 'Left _'.
+-- iff the value takes the form @'Left' _@.
 --
 -- Using @Data.Bifunctor@:
 --
@@ -156,13 +156,13 @@ mapBoth _ f (Right x) = Right (f x)
 mapLeft :: (a -> c) -> Either a b -> Either c b
 mapLeft f = mapBoth f id
 
--- | The 'mapLeft' function takes a function and applies it to an Either value
--- iff the value takes the form 'Left _'.
+-- | The 'mapRight' function takes a function and applies it to an Either value
+-- iff the value takes the form @'Right' _@.
 --
 -- Using @Data.Bifunctor@:
 --
 -- @
--- 'mapRight' = first
+-- 'mapRight' = second
 -- @
 --
 -- Using @Control.Arrow@:
@@ -174,7 +174,7 @@ mapLeft f = mapBoth f id
 -- Using @Control.Lens@:
 --
 -- @
--- 'mapRight' = 'over' '_Right'
+-- 'mapRight' = over _Right
 -- @
 --
 -- >>> mapRight (*2) (Left "hello")
@@ -186,7 +186,7 @@ mapRight :: (b -> c) -> Either a b -> Either a c
 mapRight = mapBoth id
 
 -- | The 'whenLeft' function takes an 'Either' value and a function which returns a monad.
--- The monad is only executed when the given argument takes the form @Left _@, otherwise
+-- The monad is only executed when the given argument takes the form @'Left' _@, otherwise
 -- it does nothing.
 --
 -- Using @Control.Lens@:
@@ -201,8 +201,8 @@ whenLeft :: Applicative m => Either a b -> (a -> m ()) -> m ()
 whenLeft (Left x) f = f x
 whenLeft _        _ = pure ()
 
--- | The 'whenLeft' function takes an 'Either' value and a function which returns a monad.
--- The monad is only executed when the given argument takes the form @Right _@, otherwise
+-- | The 'whenRight' function takes an 'Either' value and a function which returns a monad.
+-- The monad is only executed when the given argument takes the form @'Right' _@, otherwise
 -- it does nothing.
 --
 -- Using @Data.Foldable@:
