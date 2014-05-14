@@ -11,7 +11,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Control.Monad.Trans.Either
--- Copyright   :  (C) 2008-2013 Edward Kmett
+-- Copyright   :  (C) 2008-2014 Edward Kmett
 -- License     :  BSD-style (see the file LICENSE)
 --
 -- Maintainer  :  Edward Kmett <ekmett@gmail.com>

@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Either.Combinators
--- Copyright   :  (c) Gregory Crosswhite, Chris Done, Edward Kmett
+-- Copyright   :  (c) 2010-2014 Gregory Crosswhite, Chris Done, Edward Kmett
 -- License     :  BSD-style
 --
 -- Maintainer  :  ekmett@gmail.com
