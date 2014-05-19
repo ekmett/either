@@ -36,6 +36,7 @@ import Control.Monad (liftM, MonadPlus(..))
 import Control.Monad.Base (MonadBase(..), liftBaseDefault)
 import Control.Monad.Cont.Class
 import Control.Monad.Error.Class
+import Control.Monad.Catch
 import Control.Monad.Fix
 import Control.Monad.IO.Class
 import Control.Monad.Reader.Class
@@ -203,6 +204,16 @@ instance Monad m => MonadError e (EitherT e m) where
     Left  l -> runEitherT (h l)
     Right r -> return (Right r)
   {-# INLINE catchError #-}
+
+-- | Throws exceptions into the base monad.
+instance MonadThrow m => MonadThrow (EitherT e m) where
+  throwM = lift . throwM
+  {-# INLINE throwM #-}
+
+-- | Catches exceptions from the base monad.
+instance MonadCatch m => MonadCatch (EitherT e m) where
+  catch (EitherT m) f = EitherT $ catch m (runEitherT . f)
+  {-# INLINE catch #-}
 
 instance MonadFix m => MonadFix (EitherT e m) where
   mfix f = EitherT $ mfix $ \a -> runEitherT $ f $ case a of
