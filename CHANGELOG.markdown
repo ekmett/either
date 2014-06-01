@@ -1,3 +1,7 @@
+4.3
+---
+* Inverted dependency between `free` and `either`.
+
 4.2
 ---
 * Added instances for `MonadThrow`, `MonadCatch`.
