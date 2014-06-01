@@ -1,3 +1,7 @@
+4.2
+---
+* Added instances for `MonadThrow`, `MonadCatch`.
+
 4.1
 ---
 * Added instances for `MonadBase`, `MonadBaseControl`, and `MonadTransControl`.
