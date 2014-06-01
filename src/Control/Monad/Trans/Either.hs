@@ -36,6 +36,7 @@ import Control.Monad (liftM, MonadPlus(..))
 import Control.Monad.Base (MonadBase(..), liftBaseDefault)
 import Control.Monad.Cont.Class
 import Control.Monad.Error.Class
+import Control.Monad.Free.Class
 import Control.Monad.Catch
 import Control.Monad.Fix
 import Control.Monad.IO.Class
@@ -196,7 +197,6 @@ instance Monad m => Monad (EitherT e m) where
   fail = EitherT . fail
   {-# INLINE fail #-}
 
-
 instance Monad m => MonadError e (EitherT e m) where
   throwError = EitherT . return . Left
   {-# INLINE throwError #-}
@@ -274,6 +274,9 @@ instance MonadRandom m => MonadRandom (EitherT e m) where
 instance Foldable m => Foldable (EitherT e m) where
   foldMap f = foldMap (either mempty f) . runEitherT
   {-# INLINE foldMap #-}
+
+instance (Functor f, MonadFree f m) => MonadFree f (EitherT e m) where
+  wrap = EitherT . wrap . fmap runEitherT
 
 instance (Monad f, Traversable f) => Traversable (EitherT e f) where
   traverse f (EitherT a) =

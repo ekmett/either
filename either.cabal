@@ -1,6 +1,6 @@
 name:          either
 category:      Control, Monads
-version:       4.2
+version:       4.3
 license:       BSD3
 cabal-version: >= 1.6
 license-file:  LICENSE
@@ -28,14 +28,15 @@ source-repository head
 library
   build-depends:
     base              >= 4       && < 5,
+    exceptions        >= 0.5     && < 0.7,
+    free              >= 4.9     && < 5,
     monad-control     >= 0.3.2   && < 0.4,
     MonadRandom       == 0.1.*,
     mtl               >= 2.0     && < 2.3,
     semigroups        >= 0.8.3.1 && < 1,
     semigroupoids     >= 4       && < 5,
     transformers      >= 0.2     && < 0.5,
-    transformers-base >= 0.4     && < 0.5,
-    exceptions        >= 0.5     && < 0.7
+    transformers-base >= 0.4     && < 0.5
 
   extensions: CPP
   exposed-modules: Control.Monad.Trans.Either
