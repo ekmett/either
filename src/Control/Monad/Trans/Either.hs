@@ -37,7 +37,7 @@ import Control.Monad.Base (MonadBase(..), liftBaseDefault)
 import Control.Monad.Cont.Class
 import Control.Monad.Error.Class
 import Control.Monad.Free.Class
-import Control.Monad.Catch
+import Control.Monad.Catch as MonadCatch
 import Control.Monad.Fix
 import Control.Monad.IO.Class
 import Control.Monad.Reader.Class
@@ -212,7 +212,7 @@ instance MonadThrow m => MonadThrow (EitherT e m) where
 
 -- | Catches exceptions from the base monad.
 instance MonadCatch m => MonadCatch (EitherT e m) where
-  catch (EitherT m) f = EitherT $ catch m (runEitherT . f)
+  catch (EitherT m) f = EitherT $ MonadCatch.catch m (runEitherT . f)
   {-# INLINE catch #-}
 
 instance MonadFix m => MonadFix (EitherT e m) where
