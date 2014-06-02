@@ -1,3 +1,7 @@
+4.3.0.1
+-------
+* Fixed import of `MonadCatch` to support versions of `base` before 4.6
+
 4.3
 ---
 * Inverted dependency between `free` and `either`.
