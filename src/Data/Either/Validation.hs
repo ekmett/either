@@ -14,8 +14,7 @@
 
 module Data.Either.Validation
   ( Validation(..)
-  )
-  where
+  ) where
 
 import Control.Applicative
 import Data.Bifoldable(Bifoldable(bifoldr))
@@ -38,18 +37,18 @@ instance Functor (Validation e) where
    fmap _ (Failure e) = Failure e
    fmap f (Success a) = Success (f a)
 
-instance Monoid e => Applicative (Validation e) where
+instance Semigroup e => Applicative (Validation e) where
   pure = Success
-  Failure e1 <*> Failure e2 = Failure (e1 `mappend` e2)
+  Failure e1 <*> Failure e2 = Failure (e1 <> e2)
   Failure e1 <*> Success _  = Failure e1
   Success _  <*> Failure e2 = Failure e2
   Success f  <*> Success a  = Success (f a)
 
 instance Alt (Validation e) where
-  Failure _  <!> x = x
-  Success a  <!> _ = Success a
+  Failure _ <!> x = x
+  Success a <!> _ = Success a
 
-instance Monoid e => Alternative (Validation e) where
+instance (Semigroup e, Monoid e) => Alternative (Validation e) where
   empty = Failure mempty
   (<|>) = (<!>)
 
