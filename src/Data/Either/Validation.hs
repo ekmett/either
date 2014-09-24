@@ -13,9 +13,9 @@
 -----------------------------------------------------------------------------
 
 module Data.Either.Validation
-       ( Validation(..)
-       )
-       where
+  ( Validation(..)
+  )
+  where
 
 import Control.Applicative
 import Data.Bifoldable(Bifoldable(bifoldr))
@@ -29,35 +29,35 @@ import Data.Traversable (Traversable(traverse))
 import Prelude hiding (foldr)
 
 -- | 'Validation' is 'Either' with a Left that is a 'Monoid'
-data Validation err a =
-  Failure err
+data Validation e a
+  = Failure e
   | Success a
   deriving (Eq, Ord, Show)
 
-instance Functor (Validation err) where
+instance Functor (Validation e) where
    fmap _ (Failure e) = Failure e
    fmap f (Success a) = Success (f a)
 
-instance Monoid err => Applicative (Validation err) where
+instance Monoid e => Applicative (Validation e) where
   pure = Success
   Failure e1 <*> Failure e2 = Failure (e1 `mappend` e2)
   Failure e1 <*> Success _  = Failure e1
   Success _  <*> Failure e2 = Failure e2
   Success f  <*> Success a  = Success (f a)
 
-instance Alt (Validation err) where
+instance Alt (Validation e) where
   Failure _  <!> x = x
   Success a  <!> _ = Success a
 
-instance Monoid err => Alternative (Validation err) where
+instance Monoid e => Alternative (Validation e) where
   empty = Failure mempty
   (<|>) = (<!>)
 
-instance Foldable (Validation err) where
+instance Foldable (Validation e) where
   foldr f x (Success a) = f a x
   foldr _ x (Failure _) = x
 
-instance Traversable (Validation err) where
+instance Traversable (Validation e) where
   traverse f (Success a) = Success <$> f a
   traverse _ (Failure e) = pure (Failure e)
 
