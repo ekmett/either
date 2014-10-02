@@ -1,3 +1,5 @@
+{-# LANGUAGE Rank2Types #-}
+
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Either.Validation
@@ -14,6 +16,8 @@
 
 module Data.Either.Validation
   ( Validation(..)
+  , _Success
+  , _Failure
   ) where
 
 import Control.Applicative
@@ -23,6 +27,7 @@ import Data.Bitraversable(Bitraversable(bitraverse))
 import Data.Foldable (Foldable(foldr))
 import Data.Functor.Alt (Alt((<!>)))
 import Data.Monoid (Monoid(mappend, mempty))
+import Data.Profunctor
 import Data.Semigroup (Semigroup((<>)))
 import Data.Traversable (Traversable(traverse))
 import Prelude hiding (foldr)
@@ -84,3 +89,23 @@ instance Monoid e => Monoid (Validation e a) where
   Failure _  `mappend` Success a2 = Success a2
   Success a1 `mappend` Failure _  = Success a1
   Success a1 `mappend` Success _  = Success a1
+
+type Prism s t a b = forall p f. (Choice p, Applicative f) => p a (f b) -> p s (f t)
+
+_Failure :: Prism (Validation a c) (Validation b c) a b
+_Failure = dimap
+            (\ x
+             -> case x of
+                  Failure y -> Right y
+                  Success y -> Left (Success y))
+            (either pure (fmap (\ x -> Failure x))) . right'
+{-# INLINE _Failure #-}
+
+_Success :: Prism (Validation c a) (Validation c b) a b
+_Success = dimap
+           (\ x
+            -> case x of
+              Failure y -> Left (Failure y)
+              Success y -> Right y)
+           (either pure (fmap (\ x -> Success x))) . right'
+{-# INLINE _Success #-}
