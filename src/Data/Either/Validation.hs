@@ -20,8 +20,7 @@ module Data.Either.Validation
   , _Failure
   , eitherToValidation
   , validationToEither
-  , _EitherV
-  , _VEither
+  , _Validation
   ) where
 
 import Control.Applicative
@@ -136,14 +135,7 @@ eitherToValidation x = case x of
   Right a -> Success a
 {-# INLINE eitherToValidation #-}
 
-_VEither :: Iso (Validation e a) (Validation g b) (Either e a) (Either g b)
-_VEither = iso
-           validationToEither
-           eitherToValidation
-{-# INLINE _VEither #-}
-
-_EitherV :: Iso (Either e a) (Either g b) (Validation e a) (Validation g b)
-_EitherV = iso
-           eitherToValidation
-           validationToEither
-{-# INLINE _EitherV #-}
+-- | 'Validation' is isomorphic to 'Either'
+_Validation :: Iso (Validation e a) (Validation g b) (Either e a) (Either g b)
+_Validation = iso validationToEither eitherToValidation
+{-# INLINE _Validation #-}

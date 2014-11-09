@@ -1,3 +1,7 @@
+4.3.2
+-----
+* Added `Validation`.
+
 4.3.0.2
 -------
 * Updated MonadRandom support.
