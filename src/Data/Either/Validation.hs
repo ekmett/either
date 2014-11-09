@@ -18,6 +18,10 @@ module Data.Either.Validation
   ( Validation(..)
   , _Success
   , _Failure
+  , eitherToValidation
+  , validationToEither
+  , _EitherV
+  , _VEither
   ) where
 
 import Control.Applicative
@@ -92,20 +96,54 @@ instance Monoid e => Monoid (Validation e a) where
 
 type Prism s t a b = forall p f. (Choice p, Applicative f) => p a (f b) -> p s (f t)
 
+prism :: (b -> t) -> (s -> Either t a) -> Prism s t a b
+prism bt seta = dimap seta (either pure (fmap bt)) . right'
+{-# INLINE prism #-}
+
 _Failure :: Prism (Validation a c) (Validation b c) a b
-_Failure = dimap
-            (\ x
-             -> case x of
-                  Failure y -> Right y
-                  Success y -> Left (Success y))
-            (either pure (fmap (\ x -> Failure x))) . right'
+_Failure = prism
+           (\ x -> Failure x)
+           (\ x
+            -> case x of
+              Failure y -> Right y
+              Success y -> Left (Success y))
 {-# INLINE _Failure #-}
 
 _Success :: Prism (Validation c a) (Validation c b) a b
-_Success = dimap
+_Success = prism
+           (\ x -> Success x)
            (\ x
             -> case x of
               Failure y -> Left (Failure y)
               Success y -> Right y)
-           (either pure (fmap (\ x -> Success x))) . right'
 {-# INLINE _Success #-}
+
+type Iso s t a b = (Profunctor p, Functor f) => p a (f b) -> p s (f t)
+
+iso :: (s -> a) -> (b -> t) -> Iso s t a b
+iso sa bt = dimap sa (fmap bt)
+{-# INLINE iso #-}
+
+validationToEither :: Validation e a -> Either e a
+validationToEither x = case x of
+  Failure e -> Left e
+  Success a -> Right a
+{-# INLINE validationToEither #-}
+
+eitherToValidation :: Either e a -> Validation e a
+eitherToValidation x = case x of
+  Left e -> Failure e
+  Right a -> Success a
+{-# INLINE eitherToValidation #-}
+
+_VEither :: Iso (Validation e a) (Validation g b) (Either e a) (Either g b)
+_VEither = iso
+           validationToEither
+           eitherToValidation
+{-# INLINE _VEither #-}
+
+_EitherV :: Iso (Either e a) (Either g b) (Validation e a) (Validation g b)
+_EitherV = iso
+           eitherToValidation
+           validationToEither
+{-# INLINE _EitherV #-}
