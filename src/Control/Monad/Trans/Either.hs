@@ -288,15 +288,15 @@ instance MonadBase b m => MonadBase b (EitherT e m) where
   {-# INLINE liftBase #-}
 
 instance MonadTransControl (EitherT e) where
-  newtype StT (EitherT e) a = StEitherT {unStEitherT :: Either e a}
-  liftWith f = EitherT $ liftM return $ f $ liftM StEitherT . runEitherT
+  type StT (EitherT e) a = Either e a
+  liftWith f = EitherT $ liftM return $ f runEitherT
   {-# INLINE liftWith #-}
-  restoreT = EitherT . liftM unStEitherT
+  restoreT = EitherT
   {-# INLINE restoreT #-}
 
 instance MonadBaseControl b m => MonadBaseControl b (EitherT e m) where
-  newtype StM (EitherT e m) a = StMEitherT { unStMEitherT :: StM m (StT (EitherT e) a) }
-  liftBaseWith = defaultLiftBaseWith StMEitherT
+  type StM (EitherT e m) a = StM m (StT (EitherT e) a)
+  liftBaseWith = defaultLiftBaseWith
   {-# INLINE liftBaseWith #-}
-  restoreM     = defaultRestoreM unStMEitherT
+  restoreM     = defaultRestoreM
   {-# INLINE restoreM #-}
