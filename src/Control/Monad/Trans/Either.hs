@@ -287,6 +287,8 @@ instance MonadBase b m => MonadBase b (EitherT e m) where
   liftBase = liftBaseDefault
   {-# INLINE liftBase #-}
 
+#if MIN_VERSION_monad_control(1,0,0)
+
 instance MonadTransControl (EitherT e) where
   type StT (EitherT e) a = Either e a
   liftWith f = EitherT $ liftM return $ f runEitherT
@@ -300,3 +302,21 @@ instance MonadBaseControl b m => MonadBaseControl b (EitherT e m) where
   {-# INLINE liftBaseWith #-}
   restoreM     = defaultRestoreM
   {-# INLINE restoreM #-}
+
+#else
+
+instance MonadTransControl (EitherT e) where
+  newtype StT (EitherT e) a = StEitherT {unStEitherT :: Either e a}
+  liftWith f = EitherT $ liftM return $ f $ liftM StEitherT . runEitherT
+  {-# INLINE liftWith #-}
+  restoreT = EitherT . liftM unStEitherT
+  {-# INLINE restoreT #-}
+ 
+instance MonadBaseControl b m => MonadBaseControl b (EitherT e m) where
+  newtype StM (EitherT e m) a = StMEitherT { unStMEitherT :: StM m (StT (EitherT e) a) }
+  liftBaseWith = defaultLiftBaseWith StMEitherT
+  {-# INLINE liftBaseWith #-}
+  restoreM     = defaultRestoreM unStMEitherT
+  {-# INLINE restoreM #-}
+
+#endif
