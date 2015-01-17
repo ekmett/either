@@ -32,7 +32,7 @@ module Data.Either.Combinators
   , unlessRight
   , leftToMaybe
   , rightToMaybe
-  , generalizeEither
+  , eitherToError
   ) where
 
 import Control.Applicative
@@ -306,5 +306,5 @@ rightToMaybe :: Either a b -> Maybe b
 rightToMaybe = either (const Nothing) Just
 
 -- | Generalize 'Either e' as 'MonadError e m'.
-generalizeEither :: (MonadError e m) => Either e a -> m a
-generalizeEither = either throwError return
+eitherToError :: (MonadError e m) => Either e a -> m a
+eitherToError = either throwError return
