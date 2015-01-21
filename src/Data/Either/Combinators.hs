@@ -32,9 +32,11 @@ module Data.Either.Combinators
   , unlessRight
   , leftToMaybe
   , rightToMaybe
+  , eitherToError
   ) where
 
 import Control.Applicative
+import Control.Monad.Error.Class ( MonadError(throwError) )
 
 -- ---------------------------------------------------------------------------
 -- Functions over Either
@@ -302,3 +304,7 @@ leftToMaybe = either Just (const Nothing)
 -- Just 12
 rightToMaybe :: Either a b -> Maybe b
 rightToMaybe = either (const Nothing) Just
+
+-- | Generalize 'Either e' as 'MonadError e m'.
+eitherToError :: (MonadError e m) => Either e a -> m a
+eitherToError = either throwError return
