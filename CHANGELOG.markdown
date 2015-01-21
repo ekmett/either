@@ -1,3 +1,7 @@
+4.3.3
+-----
+* Added `eitherToError`.
+
 4.3.2.1
 -------
 * Support `monad-control` 1.0
