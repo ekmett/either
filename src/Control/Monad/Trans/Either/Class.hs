@@ -2,6 +2,8 @@
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE FlexibleInstances      #-}
 {-# LANGUAGE FlexibleContexts       #-}
+{-# LANGUAGE UndecidableInstances   #-}
+{-# LANGUAGE OverlappingInstances   #-}
 
 module Control.Monad.Trans.Either.Class where
 
@@ -15,5 +17,5 @@ class (Monad m) => MonadEither l m | m -> l where
 instance (Monad m) => MonadEither l (EitherT l m) where
     hoistEither = E.hoistEither
 
-instance (MonadTrans t, MonadEither l (t m)) => MonadEither l (EitherT l (t m)) where
+instance (MonadEither l m, MonadTrans t, Monad (t m)) => MonadEither l (t m) where
     hoistEither = lift . hoistEither
