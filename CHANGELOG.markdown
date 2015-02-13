@@ -1,3 +1,7 @@
+4.3.3.2
+------
+* Support `exceptions` 0.8
+
 4.3.3.1
 ------
 * Support `exceptions` 0.7
