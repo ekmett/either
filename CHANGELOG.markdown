@@ -1,3 +1,7 @@
+4.3.3.1
+------
+* Support `exceptions` 0.7
+
 4.3.3
 -----
 * Added `eitherToError`.
