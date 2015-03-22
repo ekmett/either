@@ -305,6 +305,9 @@ leftToMaybe = either Just (const Nothing)
 rightToMaybe :: Either a b -> Maybe b
 rightToMaybe = either (const Nothing) Just
 
--- | Generalize 'Either e' as 'MonadError e m'.
+-- | Generalize @Either e@ as @MonadError e m@.
+--
+-- If the argument has form @Left e@, an error is produced in the monad via
+-- 'throwError'. Otherwise, the @Right a@ part is forwarded.
 eitherToError :: (MonadError e m) => Either e a -> m a
 eitherToError = either throwError return

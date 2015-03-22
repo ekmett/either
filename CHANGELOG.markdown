@@ -1,9 +1,13 @@
+4.3.3.3
+-------
+* Fixed and enhanced documentation for `eitherToError`.
+
 4.3.3.2
-------
+-------
 * Support `exceptions` 0.8
 
 4.3.3.1
-------
+-------
 * Support `exceptions` 0.7
 
 4.3.3
