@@ -27,6 +27,8 @@ module Control.Monad.Trans.Either
   , bimapEitherT
   , mapEitherT
   , hoistEither
+  , bracketEitherT
+  , bracketEitherT_
   , left
   , right
   ) where
@@ -126,6 +128,29 @@ mapEitherT f m = EitherT $ f (runEitherT m)
 hoistEither :: Monad m => Either e a -> EitherT e m a
 hoistEither = EitherT . return
 {-# INLINE hoistEither #-}
+
+-- | Acquire a resource in 'EitherT' and then perform an action with it,
+-- cleaning up afterwards regardless of error. Like
+-- 'Control.Exception.bracket', but acting only in 'EitherT'.
+bracketEitherT :: Monad m => EitherT e m a -> (a -> EitherT e m b) -> (a -> EitherT e m c) -> EitherT e m c
+bracketEitherT before after thing = do
+    a <- before
+    r <- thing a `catchError` (\err -> after a >> left err)
+    -- If catchError already triggered, then `after` already ran *and* we are
+    -- in a Left state, so `after` will not run again here.
+    _ <- after a
+    return r
+
+-- | Version of 'bracketEitherT' which discards the result from the initial
+-- action.
+bracketEitherT_ :: Monad m => EitherT e m a -> EitherT e m b -> EitherT e m c -> EitherT e m c
+bracketEitherT_ before after thing = do
+    _ <- before
+    r <- thing `catchError` (\err -> after >> left err)
+    -- If catchError already triggered, then `after` already ran *and* we are
+    -- in a Left state, so `after` will not run again here.
+    _ <- after
+    return r
 
 instance Monad m => Functor (EitherT e m) where
   fmap f = EitherT . liftM (fmap f) . runEitherT
