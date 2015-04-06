@@ -23,6 +23,8 @@ module Data.Either.Combinators
   , fromRight
   , fromLeft'
   , fromRight'
+  , catRights
+  , catLefts
   , mapBoth
   , mapLeft
   , mapRight
@@ -104,6 +106,25 @@ fromLeft' (Left x)  = x
 fromRight' :: Either a b -> b
 fromRight' (Left _)  = error "Data.Either.Combinators.fromRight: Argument takes form 'Left _'" -- yuck
 fromRight' (Right x) = x
+
+-- | Extract all right elements from list of Either values
+--
+-- >>> catRights [Right 1, Left 2, Right 3]
+-- [1,3]
+catRights :: [Either a b] -> [b]
+catRights []          = []
+catRights (Right b:x) = b:catRights x
+catRights (_:x)       = catRights x
+
+-- | Extract all left elements from list of Either values
+--
+-- >>> catLefts [Right 1, Left 2, Right 3]
+-- [2]
+catLefts :: [Either a b] -> [a]
+catLefts []         = []
+catLefts (Left a:x) = a:catLefts x
+catLefts (_:x)      = catLefts x
+
 
 -- | The 'mapBoth' function takes two functions and applies the first if iff the value
 -- takes the form @'Left' _@ and the second if the value takes the form @'Right' _@.
