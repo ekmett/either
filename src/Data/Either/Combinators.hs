@@ -302,3 +302,14 @@ leftToMaybe = either Just (const Nothing)
 -- Just 12
 rightToMaybe :: Either a b -> Maybe b
 rightToMaybe = either (const Nothing) Just
+
+-- |Flip the 'Left' and 'Right' sides of an 'Either'.
+--
+-- @
+-- >>> flipEither (Right 3)
+-- Left 3
+--
+-- >>> flipEither (Left "error")
+-- Right "error"
+-- @
+flipEither :: Either e a -> Either e a
