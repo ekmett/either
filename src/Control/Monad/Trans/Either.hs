@@ -29,6 +29,7 @@ module Control.Monad.Trans.Either
   , hoistEither
   , left
   , right
+  , flipEitherT
   ) where
 
 import Control.Applicative
@@ -46,6 +47,7 @@ import Control.Monad.Trans.Class
 import Control.Monad.Trans.Control (MonadBaseControl(..), MonadTransControl(..), defaultLiftBaseWith, defaultRestoreM)
 import Control.Monad.Writer.Class
 import Control.Monad.Random (MonadRandom,getRandom,getRandoms,getRandomR,getRandomRs)
+import Data.Either.Combinators ( flipEither )
 import Data.Foldable
 import Data.Function (on)
 import Data.Functor.Bind
@@ -126,6 +128,11 @@ mapEitherT f m = EitherT $ f (runEitherT m)
 hoistEither :: Monad m => Either e a -> EitherT e m a
 hoistEither = EitherT . return
 {-# INLINE hoistEither #-}
+
+-- | Monad transformer version of 'flipEither'.
+flipEitherT :: (Functor f) => EitherT e m a -> EitherT a m e
+flipEitherT = EitherT . fmap flipEither . runEitherT
+{-# INLINE flipEitherT #-}
 
 instance Monad m => Functor (EitherT e m) where
   fmap f = EitherT . liftM (fmap f) . runEitherT
