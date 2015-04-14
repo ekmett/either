@@ -303,7 +303,7 @@ leftToMaybe = either Just (const Nothing)
 rightToMaybe :: Either a b -> Maybe b
 rightToMaybe = either (const Nothing) Just
 
--- |Flip the 'Left' and 'Right' sides of an 'Either'.
+-- | Flip the 'Left' and 'Right' sides of an 'Either'.
 --
 -- @
 -- >>> flipEither (Right 3)
@@ -314,3 +314,4 @@ rightToMaybe = either (const Nothing) Just
 -- @
 flipEither :: Either e a -> Either e a
 flipEither = either Right Left
+{-# INLINE flipEither #-}
