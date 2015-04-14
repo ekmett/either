@@ -1,3 +1,27 @@
+4.3.3.3
+-------
+* Fixed and enhanced documentation for `eitherToError`.
+
+4.3.3.2
+-------
+* Support `exceptions` 0.8
+
+4.3.3.1
+-------
+* Support `exceptions` 0.7
+
+4.3.3
+-----
+* Added `eitherToError`.
+
+4.3.2.1
+-------
+* Support `monad-control` 1.0
+
+4.3.2
+-----
+* Added `Validation`.
+
 4.3.0.2
 -------
 * Updated MonadRandom support.

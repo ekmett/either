@@ -32,10 +32,12 @@ module Data.Either.Combinators
   , unlessRight
   , leftToMaybe
   , rightToMaybe
-  , flipEither
+  , eitherToError
+  , swapEither
   ) where
 
 import Control.Applicative
+import Control.Monad.Error.Class ( MonadError(throwError) )
 
 -- ---------------------------------------------------------------------------
 -- Functions over Either
@@ -304,15 +306,23 @@ leftToMaybe = either Just (const Nothing)
 rightToMaybe :: Either a b -> Maybe b
 rightToMaybe = either (const Nothing) Just
 
--- | Flip the 'Left' and 'Right' sides of an 'Either'.
+
+-- | Generalize @Either e@ as @MonadError e m@.
+--
+-- If the argument has form @Left e@, an error is produced in the monad via
+-- 'throwError'. Otherwise, the @Right a@ part is forwarded.
+eitherToError :: (MonadError e m) => Either e a -> m a
+eitherToError = either throwError return
+
+-- | Swap the 'Left' and 'Right' sides of an 'Either'.
 --
 -- @
--- >>> flipEither (Right 3)
+-- >>> swapEither (Right 3)
 -- Left 3
 --
--- >>> flipEither (Left "error")
+-- >>> swapEither (Left "error")
 -- Right "error"
 -- @
-flipEither :: Either e a -> Either e a
-flipEither = either Right Left
-{-# INLINE flipEither #-}
+swapEither :: Either e a -> Either a e
+swapEither = either Right Left
+{-# INLINE swapEither #-}

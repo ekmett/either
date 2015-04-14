@@ -1,6 +1,6 @@
 name:          either
 category:      Control, Monads
-version:       4.3.1
+version:       4.3.3.3
 license:       BSD3
 cabal-version: >= 1.6
 license-file:  LICENSE
@@ -29,11 +29,12 @@ library
   build-depends:
     base              >= 4       && < 5,
     bifunctors        >= 4       && < 5,
-    exceptions        >= 0.5     && < 0.7,
+    exceptions        >= 0.5     && < 0.9,
     free              >= 4.9     && < 5,
-    monad-control     >= 0.3.2   && < 0.4,
+    monad-control     >= 0.3.2   && < 1.1,
     MonadRandom       >= 0.1     && < 0.4,
     mtl               >= 2.0     && < 2.3,
+    profunctors       >= 4       && < 5,
     semigroups        >= 0.8.3.1 && < 1,
     semigroupoids     >= 4       && < 5,
     transformers      >= 0.2     && < 0.5,
