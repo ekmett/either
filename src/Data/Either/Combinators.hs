@@ -32,6 +32,7 @@ module Data.Either.Combinators
   , unlessRight
   , leftToMaybe
   , rightToMaybe
+  , flipEither
   ) where
 
 import Control.Applicative
