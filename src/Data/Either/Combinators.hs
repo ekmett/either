@@ -313,3 +313,4 @@ rightToMaybe = either (const Nothing) Just
 -- Right "error"
 -- @
 flipEither :: Either e a -> Either e a
+flipEither = either Right Left
