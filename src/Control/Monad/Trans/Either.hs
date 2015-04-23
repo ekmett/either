@@ -186,7 +186,7 @@ instance (Applicative m, Monoid e) => Alternative (EitherT e m) where
   empty = EitherT $ pure (Left mempty)
   {-# INLINE empty #-}
 
-instance (Monad m, Monoid e) => MonadPlus (EitherT e m) where
+instance (Applicative m, Monad m, Monoid e) => MonadPlus (EitherT e m) where
   mplus = (<|>)
   {-# INLINE mplus #-}
 
@@ -199,7 +199,7 @@ instance Monad m => Semigroup (EitherT e m a) where
     Right r -> return (Right r)
   {-# INLINE (<>) #-}
 
-instance (Monad m, Semigroup e) => Alt (EitherT e m) where
+instance (Functor m, Monad m, Semigroup e) => Alt (EitherT e m) where
   EitherT m <!> EitherT n = EitherT $ m >>= \a -> case a of
     Left l -> liftM (\b -> case b of
       Left l' -> Left (l <> l')
