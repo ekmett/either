@@ -173,15 +173,17 @@ instance Applicative m => Applicative (EitherT e m) where
   (<*>) a b = EitherT $ (<*>) <$> runEitherT a <*> runEitherT b
   {-# INLINE (<*>) #-}
 
-instance (Monad m, Monoid e) => Alternative (EitherT e m) where
-  EitherT m <|> EitherT n = EitherT $ m >>= \a -> case a of
-    Left l -> liftM (\b -> case b of
-      Left l' -> Left (mappend l l')
-      Right r -> Right r) n
-    Right r -> return (Right r)
+instance (Applicative m, Monoid e) => Alternative (EitherT e m) where
+  (<|>) a b = EitherT $ combine <$> runEitherT a <*> runEitherT b
+    where 
+      combine l r = case l of
+        Left l -> case r of
+          Left l' -> Left (mappend l l')
+          Right r -> Right r
+        Right r -> Right r
   {-# INLINE (<|>) #-}
 
-  empty = EitherT $ return (Left mempty)
+  empty = EitherT $ pure (Left mempty)
   {-# INLINE empty #-}
 
 instance (Monad m, Monoid e) => MonadPlus (EitherT e m) where
