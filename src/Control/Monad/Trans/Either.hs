@@ -159,8 +159,8 @@ swapEitherT :: (Functor m) => EitherT e m a -> EitherT a m e
 swapEitherT = EitherT . fmap swapEither . runEitherT
 {-# INLINE swapEitherT #-}
 
-instance Monad m => Functor (EitherT e m) where
-  fmap f = EitherT . liftM (fmap f) . runEitherT
+instance Functor m => Functor (EitherT e m) where
+  fmap f = EitherT . fmap (fmap f) . runEitherT
   {-# INLINE fmap #-}
 
 instance Monad m => Apply (EitherT e m) where
