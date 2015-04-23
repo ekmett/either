@@ -199,12 +199,14 @@ instance Monad m => Semigroup (EitherT e m a) where
     Right r -> return (Right r)
   {-# INLINE (<>) #-}
 
-instance (Functor m, Monad m, Semigroup e) => Alt (EitherT e m) where
-  EitherT m <!> EitherT n = EitherT $ m >>= \a -> case a of
-    Left l -> liftM (\b -> case b of
-      Left l' -> Left (l <> l')
-      Right r -> Right r) n
-    Right r -> return (Right r)
+instance (Apply m, Semigroup e) => Alt (EitherT e m) where
+  (<!>) a b = EitherT $ combine <$> runEitherT a <.> runEitherT b
+    where 
+      combine l r = case l of
+        Left l -> case r of
+          Left l' -> Left ((<>) l l')
+          Right r -> Right r
+        Right r -> Right r
   {-# INLINE (<!>) #-}
 
 instance (Monad m, Apply m) => Bind (EitherT e m) where
