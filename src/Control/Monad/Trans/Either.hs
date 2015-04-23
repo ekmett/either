@@ -171,14 +171,10 @@ instance Monad m => Apply (EitherT e m) where
       Right x -> return (Right (k x))
   {-# INLINE (<.>) #-}
 
-instance Monad m => Applicative (EitherT e m) where
-  pure a  = EitherT $ return (Right a)
+instance Applicative m => Applicative (EitherT e m) where
+  pure = EitherT . pure . Right
   {-# INLINE pure #-}
-  EitherT f <*> EitherT v = EitherT $ f >>= \mf -> case mf of
-    Left  e -> return (Left e)
-    Right k -> v >>= \mv -> case mv of
-      Left  e -> return (Left e)
-      Right x -> return (Right (k x))
+  (<*>) a b = EitherT $ (<*>) <$> runEitherT a <*> runEitherT b
   {-# INLINE (<*>) #-}
 
 instance (Monad m, Monoid e) => Alternative (EitherT e m) where
