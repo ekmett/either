@@ -163,12 +163,8 @@ instance Functor m => Functor (EitherT e m) where
   fmap f = EitherT . fmap (fmap f) . runEitherT
   {-# INLINE fmap #-}
 
-instance Monad m => Apply (EitherT e m) where
-  EitherT f <.> EitherT v = EitherT $ f >>= \mf -> case mf of
-    Left  e -> return (Left e)
-    Right k -> v >>= \mv -> case mv of
-      Left  e -> return (Left e)
-      Right x -> return (Right (k x))
+instance Apply m => Apply (EitherT e m) where
+  (<.>) a b = EitherT $ (<.>) <$> runEitherT a <.> runEitherT b
   {-# INLINE (<.>) #-}
 
 instance Applicative m => Applicative (EitherT e m) where
@@ -209,7 +205,7 @@ instance (Monad m, Semigroup e) => Alt (EitherT e m) where
     Right r -> return (Right r)
   {-# INLINE (<!>) #-}
 
-instance Monad m => Bind (EitherT e m) where
+instance (Monad m, Apply m) => Bind (EitherT e m) where
   (>>-) = (>>=)
   {-# INLINE (>>-) #-}
 
