@@ -1,3 +1,7 @@
+4.3.4
+-----
+* Support `bifunctors` 5, `profunctors` 5, and `semigroupoids` 5.
+
 4.3.3.3
 -------
 * Fixed and enhanced documentation for `eitherToError`.
