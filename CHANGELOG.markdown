@@ -1,3 +1,7 @@
+4.3.4.1
+-------
+* Support `MonadRandom` 0.4
+
 4.3.4
 -----
 * Support `bifunctors` 5, `profunctors` 5, and `semigroupoids` 5.
