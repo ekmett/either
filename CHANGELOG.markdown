@@ -1,3 +1,7 @@
+4.4
+---
+* Support `mmorph`
+
 4.3.4.1
 -------
 * Support `MonadRandom` 0.4
