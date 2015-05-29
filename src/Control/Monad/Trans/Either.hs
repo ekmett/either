@@ -7,6 +7,7 @@
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE UndecidableInstances  #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE TypeFamilies #-}
 -----------------------------------------------------------------------------
 -- |
@@ -49,6 +50,7 @@ import Control.Monad.Trans.Class
 import Control.Monad.Trans.Control (MonadBaseControl(..), MonadTransControl(..), defaultLiftBaseWith, defaultRestoreM)
 import Control.Monad.Writer.Class
 import Control.Monad.Random (MonadRandom,getRandom,getRandoms,getRandomR,getRandomRs)
+import Control.Monad.Morph (MFunctor, hoist)
 import Data.Either.Combinators ( swapEither )
 import Data.Foldable
 import Data.Function (on)
@@ -91,6 +93,10 @@ instance Eq (m (Either e a)) => Eq (EitherT e m a) where
 instance Ord (m (Either e a)) => Ord (EitherT e m a) where
   compare = compare `on` runEitherT
   {-# INLINE compare #-}
+
+instance MFunctor (EitherT e) where
+  hoist f = EitherT . f . runEitherT
+  {-# INLINE hoist #-}
 
 -- | Given a pair of actions, one to perform in case of failure, and one to perform
 -- in case of success, run an 'EitherT' and get back a monadic result.
@@ -343,7 +349,7 @@ instance MonadTransControl (EitherT e) where
   {-# INLINE liftWith #-}
   restoreT = EitherT . liftM unStEitherT
   {-# INLINE restoreT #-}
- 
+
 instance MonadBaseControl b m => MonadBaseControl b (EitherT e m) where
   newtype StM (EitherT e m) a = StMEitherT { unStMEitherT :: StM m (StT (EitherT e) a) }
   liftBaseWith = defaultLiftBaseWith StMEitherT
