@@ -117,7 +117,7 @@ _Success = prism
               Success y -> Right y)
 {-# INLINE _Success #-}
 
-type Iso s t a b = (Profunctor p, Functor f) => p a (f b) -> p s (f t)
+type Iso s t a b = forall p f. (Profunctor p, Functor f) => p a (f b) -> p s (f t)
 
 iso :: (s -> a) -> (b -> t) -> Iso s t a b
 iso sa bt = dimap sa (fmap bt)
