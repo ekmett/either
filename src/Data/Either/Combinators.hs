@@ -237,7 +237,7 @@ unlessRight = whenLeft
 -- | Extract the left value or a default.
 --
 -- @
--- 'fromLeft' ≡ 'either' 'id'
+-- 'fromLeft' b ≡ 'either' 'id' ('const' b)
 -- @
 --
 -- >>> fromLeft "hello" (Right 42)
@@ -252,7 +252,7 @@ fromLeft x _ = x
 -- | Extract the right value or a default.
 --
 -- @
--- 'fromRight' b ≡ 'either' b 'id'
+-- 'fromRight' b ≡ 'either' ('const' b) 'id'
 -- @
 --
 -- >>> fromRight "hello" (Right "world")
