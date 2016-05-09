@@ -1,3 +1,12 @@
+4.4.1.1
+-------
+* Fixed building on newer GHCs. (type synonyms require explicit foralls for unused variables these days)
+
+4.4.1
+-----
+* `transformers` 0.5 support
+* Documentation fixes
+
 4.4
 ---
 * Support `mmorph`
