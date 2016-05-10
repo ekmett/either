@@ -1,3 +1,7 @@
+next
+----
+* Add `MMonad` instance for `EitherT`
+
 4.4.1.1
 -------
 * Fixed building on newer GHCs. (type synonyms require explicit foralls for unused variables these days)

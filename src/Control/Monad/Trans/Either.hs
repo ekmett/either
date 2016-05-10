@@ -50,7 +50,7 @@ import Control.Monad.Trans.Class
 import Control.Monad.Trans.Control (MonadBaseControl(..), MonadTransControl(..), defaultLiftBaseWith, defaultRestoreM)
 import Control.Monad.Writer.Class
 import Control.Monad.Random (MonadRandom,getRandom,getRandoms,getRandomR,getRandomRs)
-import Control.Monad.Morph (MFunctor, hoist)
+import Control.Monad.Morph (MFunctor(..), MMonad(..))
 import Data.Either.Combinators ( swapEither )
 import Data.Foldable
 import Data.Function (on)
@@ -97,6 +97,15 @@ instance Ord (m (Either e a)) => Ord (EitherT e m a) where
 instance MFunctor (EitherT e) where
   hoist f = EitherT . f . runEitherT
   {-# INLINE hoist #-}
+
+instance MMonad (EitherT e) where
+  embed f m = EitherT $ do
+    x <- runEitherT . f . runEitherT $ m
+    return $ case x of
+        Left         e  -> Left e
+        Right (Left  e) -> Left e
+        Right (Right a) -> Right a
+  {-# INLINE embed #-}
 
 -- | Given a pair of actions, one to perform in case of failure, and one to perform
 -- in case of success, run an 'EitherT' and get back a monadic result.
