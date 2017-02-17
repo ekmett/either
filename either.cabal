@@ -1,6 +1,6 @@
 name:          either
 category:      Control, Monads
-version:       3.4
+version:       4.4.1.1
 license:       BSD3
 cabal-version: >= 1.6
 license-file:  LICENSE
@@ -9,7 +9,7 @@ maintainer:    Edward A. Kmett <ekmett@gmail.com>
 stability:     provisional
 homepage:      http://github.com/ekmett/either/
 bug-reports:   http://github.com/ekmett/either/issues
-copyright:     Copyright (C) 2008-2013 Edward A. Kmett
+copyright:     Copyright (C) 2008-2014 Edward A. Kmett
 synopsis:      An either monad transformer
 description:   An either monad transformer
 build-type:    Simple
@@ -27,14 +27,23 @@ source-repository head
 
 library
   build-depends:
-    base          >= 4       && < 5,
-    MonadRandom   == 0.1.*,
-    mtl           >= 2.0     && < 2.2,
-    semigroups    >= 0.8.3.1 && < 1,
-    semigroupoids >= 3       && < 4,
-    transformers  >= 0.2     && < 0.4
+    base              >= 4       && < 5,
+    bifunctors        >= 4       && < 6,
+    exceptions        >= 0.5     && < 0.9,
+    free              >= 4.9     && < 5,
+    monad-control     >= 0.3.2   && < 1.1,
+    MonadRandom       >= 0.1     && < 0.6,
+    mtl               >= 2.0     && < 2.3,
+    mmorph            >= 1.0.0   && < 1.1,
+    profunctors       >= 4       && < 6,
+    semigroups        >= 0.8.3.1 && < 1,
+    semigroupoids     >= 4       && < 6,
+    transformers      >= 0.2     && < 0.6,
+    transformers-base >= 0.4     && < 0.5
 
   extensions: CPP
   exposed-modules: Control.Monad.Trans.Either
+                   Data.Either.Combinators
+                   Data.Either.Validation
   ghc-options: -Wall
   hs-source-dirs: src

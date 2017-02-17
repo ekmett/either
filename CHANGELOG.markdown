@@ -1,3 +1,84 @@
+next
+----
+* Add `MMonad` instance for `EitherT`
+
+4.4.1.1
+-------
+* Fixed building on newer GHCs. (type synonyms require explicit foralls for unused variables these days)
+
+4.4.1
+-----
+* `transformers` 0.5 support
+* Documentation fixes
+
+4.4
+---
+* Support `mmorph`
+
+4.3.4.1
+-------
+* Support `MonadRandom` 0.4
+
+4.3.4
+-----
+* Support `bifunctors` 5, `profunctors` 5, and `semigroupoids` 5.
+
+4.3.3.3
+-------
+* Fixed and enhanced documentation for `eitherToError`.
+
+4.3.3.2
+-------
+* Support `exceptions` 0.8
+
+4.3.3.1
+-------
+* Support `exceptions` 0.7
+
+4.3.3
+-----
+* Added `eitherToError`.
+
+4.3.2.1
+-------
+* Support `monad-control` 1.0
+
+4.3.2
+-----
+* Added `Validation`.
+
+4.3.0.2
+-------
+* Updated MonadRandom support.
+
+4.3.0.1
+-------
+* Fixed import of `MonadCatch` to support versions of `base` before 4.6
+
+4.3
+---
+* Inverted dependency between `free` and `either`.
+
+4.2
+---
+* Added instances for `MonadThrow`, `MonadCatch`.
+
+4.1
+---
+* Added instances for `MonadBase`, `MonadBaseControl`, and `MonadTransControl`.
+
+4.0
+---
+* Updated dependencies.
+
+3.4.2
+-----
+* Added 'Data.Either.Combinators'.
+
+3.4.1
+-----
+* Trustworthy despite UndecidableInstances
+
 3.4
 ---
 * Delegate `fail` to the underlying `Monad`, rather than `error`.

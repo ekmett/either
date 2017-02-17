@@ -1,11 +1,18 @@
+{-# LANGUAGE CPP #-}
+#if defined(__GLASGOW_HASKELL__) && __GLASGOW_HASKELL__ >= 702
+{-# LANGUAGE Trustworthy #-}
+#endif
+
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE UndecidableInstances  #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE TypeFamilies #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Control.Monad.Trans.Either
--- Copyright   :  (C) 2008-2013 Edward Kmett
+-- Copyright   :  (C) 2008-2014 Edward Kmett
 -- License     :  BSD-style (see the file LICENSE)
 --
 -- Maintainer  :  Edward Kmett <ekmett@gmail.com>
@@ -21,22 +28,31 @@ module Control.Monad.Trans.Either
   , bimapEitherT
   , mapEitherT
   , hoistEither
+  , bracketEitherT
+  , bracketEitherT_
   , left
   , right
   , finallyE
+  , swapEitherT
   ) where
 
 import Control.Applicative
 import Control.Monad (liftM, MonadPlus(..))
+import Control.Monad.Base (MonadBase(..), liftBaseDefault)
 import Control.Monad.Cont.Class
 import Control.Monad.Error.Class
+import Control.Monad.Free.Class
+import Control.Monad.Catch as MonadCatch
 import Control.Monad.Fix
 import Control.Monad.IO.Class
 import Control.Monad.Reader.Class
 import Control.Monad.State (MonadState,get,put)
 import Control.Monad.Trans.Class
+import Control.Monad.Trans.Control (MonadBaseControl(..), MonadTransControl(..), defaultLiftBaseWith, defaultRestoreM)
 import Control.Monad.Writer.Class
 import Control.Monad.Random (MonadRandom,getRandom,getRandoms,getRandomR,getRandomRs)
+import Control.Monad.Morph (MFunctor(..), MMonad(..))
+import Data.Either.Combinators ( swapEither )
 import Data.Foldable
 import Data.Function (on)
 import Data.Functor.Bind
@@ -55,7 +71,7 @@ import Data.Semigroup
 -- apomorphism is the generalized anamorphism for this Monad, but it cannot be
 -- written with 'ErrorT'.
 --
--- In addition to the combinators here, the @errors@ package provides a large 
+-- In addition to the combinators here, the @errors@ package provides a large
 -- number of combinators for working with this type.
 newtype EitherT e m a = EitherT { runEitherT :: m (Either e a) }
 
@@ -78,6 +94,19 @@ instance Eq (m (Either e a)) => Eq (EitherT e m a) where
 instance Ord (m (Either e a)) => Ord (EitherT e m a) where
   compare = compare `on` runEitherT
   {-# INLINE compare #-}
+
+instance MFunctor (EitherT e) where
+  hoist f = EitherT . f . runEitherT
+  {-# INLINE hoist #-}
+
+instance MMonad (EitherT e) where
+  embed f m = EitherT $ do
+    x <- runEitherT . f . runEitherT $ m
+    return $ case x of
+        Left         e  -> Left e
+        Right (Left  e) -> Left e
+        Right (Right a) -> Right a
+  {-# INLINE embed #-}
 
 -- | Given a pair of actions, one to perform in case of failure, and one to perform
 -- in case of success, run an 'EitherT' and get back a monadic result.
@@ -117,6 +146,34 @@ mapEitherT f m = EitherT $ f (runEitherT m)
 hoistEither :: Monad m => Either e a -> EitherT e m a
 hoistEither = EitherT . return
 {-# INLINE hoistEither #-}
+
+-- | Acquire a resource in 'EitherT' and then perform an action with it,
+-- cleaning up afterwards regardless of error. Like
+-- 'Control.Exception.bracket', but acting only in 'EitherT'.
+bracketEitherT :: Monad m => EitherT e m a -> (a -> EitherT e m b) -> (a -> EitherT e m c) -> EitherT e m c
+bracketEitherT before after thing = do
+    a <- before
+    r <- thing a `catchError` (\err -> after a >> left err)
+    -- If catchError already triggered, then `after` already ran *and* we are
+    -- in a Left state, so `after` will not run again here.
+    _ <- after a
+    return r
+
+-- | Version of 'bracketEitherT' which discards the result from the initial
+-- action.
+bracketEitherT_ :: Monad m => EitherT e m a -> EitherT e m b -> EitherT e m c -> EitherT e m c
+bracketEitherT_ before after thing = do
+    _ <- before
+    r <- thing `catchError` (\err -> after >> left err)
+    -- If catchError already triggered, then `after` already ran *and* we are
+    -- in a Left state, so `after` will not run again here.
+    _ <- after
+    return r
+
+-- | Monad transformer version of 'swapEither'.
+swapEitherT :: (Functor m) => EitherT e m a -> EitherT a m e
+swapEitherT = EitherT . fmap swapEither . runEitherT
+{-# INLINE swapEitherT #-}
 
 instance Monad m => Functor (EitherT e m) where
   fmap f = EitherT . liftM (fmap f) . runEitherT
@@ -188,7 +245,6 @@ instance Monad m => Monad (EitherT e m) where
   fail = EitherT . fail
   {-# INLINE fail #-}
 
-
 instance Monad m => MonadError e (EitherT e m) where
   throwError = EitherT . return . Left
   {-# INLINE throwError #-}
@@ -196,6 +252,16 @@ instance Monad m => MonadError e (EitherT e m) where
     Left  l -> runEitherT (h l)
     Right r -> return (Right r)
   {-# INLINE catchError #-}
+
+-- | Throws exceptions into the base monad.
+instance MonadThrow m => MonadThrow (EitherT e m) where
+  throwM = lift . throwM
+  {-# INLINE throwM #-}
+
+-- | Catches exceptions from the base monad.
+instance MonadCatch m => MonadCatch (EitherT e m) where
+  catch (EitherT m) f = EitherT $ MonadCatch.catch m (runEitherT . f)
+  {-# INLINE catch #-}
 
 instance MonadFix m => MonadFix (EitherT e m) where
   mfix f = EitherT $ mfix $ \a -> runEitherT $ f $ case a of
@@ -257,6 +323,9 @@ instance Foldable m => Foldable (EitherT e m) where
   foldMap f = foldMap (either mempty f) . runEitherT
   {-# INLINE foldMap #-}
 
+instance (Functor f, MonadFree f m) => MonadFree f (EitherT e m) where
+  wrap = EitherT . wrap . fmap runEitherT
+
 instance (Monad f, Traversable f) => Traversable (EitherT e f) where
   traverse f (EitherT a) =
     EitherT <$> traverse (either (pure . Left) (fmap Right . f)) a
@@ -276,3 +345,41 @@ finallyE action cleanup = EitherT $ do
     case result of
         Left e  -> Left `liftM` cleanup e
         Right _ -> return result
+
+instance MonadBase b m => MonadBase b (EitherT e m) where
+  liftBase = liftBaseDefault
+  {-# INLINE liftBase #-}
+
+#if MIN_VERSION_monad_control(1,0,0)
+
+instance MonadTransControl (EitherT e) where
+  type StT (EitherT e) a = Either e a
+  liftWith f = EitherT $ liftM return $ f runEitherT
+  {-# INLINE liftWith #-}
+  restoreT = EitherT
+  {-# INLINE restoreT #-}
+
+instance MonadBaseControl b m => MonadBaseControl b (EitherT e m) where
+  type StM (EitherT e m) a = StM m (StT (EitherT e) a)
+  liftBaseWith = defaultLiftBaseWith
+  {-# INLINE liftBaseWith #-}
+  restoreM     = defaultRestoreM
+  {-# INLINE restoreM #-}
+
+#else
+
+instance MonadTransControl (EitherT e) where
+  newtype StT (EitherT e) a = StEitherT {unStEitherT :: Either e a}
+  liftWith f = EitherT $ liftM return $ f $ liftM StEitherT . runEitherT
+  {-# INLINE liftWith #-}
+  restoreT = EitherT . liftM unStEitherT
+  {-# INLINE restoreT #-}
+
+instance MonadBaseControl b m => MonadBaseControl b (EitherT e m) where
+  newtype StM (EitherT e m) a = StMEitherT { unStMEitherT :: StM m (StT (EitherT e) a) }
+  liftBaseWith = defaultLiftBaseWith StMEitherT
+  {-# INLINE liftBaseWith #-}
+  restoreM     = defaultRestoreM unStMEitherT
+  {-# INLINE restoreM #-}
+
+#endif
