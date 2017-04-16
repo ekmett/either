@@ -43,6 +43,7 @@ library
 
   extensions: CPP
   exposed-modules: Control.Monad.Trans.Either
+                   Control.Monad.Trans.Either.Class
                    Data.Either.Combinators
                    Data.Either.Validation
   ghc-options: -Wall
