@@ -23,6 +23,7 @@
 -----------------------------------------------------------------------------
 
 module Control.Monad.Trans.Either
+{-# DEPRECATED "Use \"Control.Monad.Trans.Except\" from transformers or transformers-compat instead." #-}
   ( EitherT(..)
   , eitherT
   , bimapEitherT
