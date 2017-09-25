@@ -1,6 +1,7 @@
 next
 ----
 * Add `MMonad` instance for `EitherT`
+* Deprecate `Control.Monad.Trans.Either` in favor of `Control.Monad.Trans.Except`
 
 4.4.1.1
 -------
