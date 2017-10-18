@@ -34,6 +34,7 @@ module Control.Monad.Trans.Either
   , left
   , right
   , swapEitherT
+  , twiddle
   ) where
 
 import Control.Applicative
@@ -132,6 +133,11 @@ bimapEitherT f g (EitherT m) = EitherT (fmap h m) where
   h (Left e)  = Left (f e)
   h (Right a) = Right (g a)
 {-# INLINE bimapEitherT #-}
+
+-- | Map over failure
+twiddle :: Functor m => (e -> f) -> EitherT e m a -> EitherT f m a
+twiddle f = bimapEitherT f id
+{-# INLINE twiddle #-}
 
 -- | Map the unwrapped computation using the given function.
 --
