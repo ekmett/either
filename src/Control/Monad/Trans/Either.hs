@@ -2,7 +2,6 @@
 #if defined(__GLASGOW_HASKELL__) && __GLASGOW_HASKELL__ >= 702
 {-# LANGUAGE Trustworthy #-}
 #endif
-
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE UndecidableInstances  #-}
@@ -54,11 +53,15 @@ import Control.Monad.Writer.Class
 import Control.Monad.Random (MonadRandom,getRandom,getRandoms,getRandomR,getRandomRs)
 import Control.Monad.Morph (MFunctor(..), MMonad(..))
 import Data.Either.Combinators ( swapEither )
+#if __GLASGOW_HASKELL__ < 710
 import Data.Foldable
+#endif
 import Data.Function (on)
 import Data.Functor.Bind
 import Data.Functor.Plus
+#if __GLASGOW_HASKELL__ < 710
 import Data.Traversable
+#endif
 import Data.Semigroup
 
 -- | 'EitherT' is a version of 'Control.Monad.Trans.Error.ErrorT' that does not
