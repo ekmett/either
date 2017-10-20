@@ -60,10 +60,6 @@ instance Alt (Validation e) where
   Failure _ <!> x = x
   Success a <!> _ = Success a
 
-instance (Semigroup e, Monoid e) => Alternative (Validation e) where
-  empty = Failure mempty
-  (<|>) = (<!>)
-
 instance Foldable (Validation e) where
   foldr f x (Success a) = f a x
   foldr _ x (Failure _) = x
