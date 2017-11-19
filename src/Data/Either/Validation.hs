@@ -21,6 +21,7 @@ module Data.Either.Validation
   , eitherToValidation
   , validationToEither
   , _Validation
+  , vap
   ) where
 
 import Control.Applicative
@@ -143,3 +144,10 @@ eitherToValidation x = case x of
 _Validation :: Iso (Validation e a) (Validation g b) (Either e a) (Either g b)
 _Validation = iso validationToEither eitherToValidation
 {-# INLINE _Validation #-}
+
+vap :: Semigroup m => Either m (a -> b) -> Either m a -> Either m b
+vap (Left m) (Left n) = Left (m <> n)
+vap (Left m) Right{} = Left m
+vap Right{} (Left n) = Left n
+vap (Right f) (Right a) = Right (f a)
+{-# INLINE vap #-}
