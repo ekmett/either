@@ -57,9 +57,10 @@ instance Semigroup e => Applicative (Validation e) where
   pure = Success
   (<*>) = (<.>)
 
-instance Alt (Validation e) where
-  Failure _ <!> x = x
-  Success a <!> _ = Success a
+instance Semigroup e => Alt (Validation e) where
+  s@Success{} <!> _ = s
+  _ <!> s@Success{} = s
+  Failure m <!> Failure n = Failure (m <> n)
 
 instance (Semigroup e, Monoid e) => Alternative (Validation e) where
   empty = Failure mempty
