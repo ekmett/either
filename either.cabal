@@ -29,22 +29,15 @@ library
   build-depends:
     base              >= 4       && < 5,
     bifunctors        >= 4       && < 6,
-    exceptions        >= 0.5     && < 0.9,
-    free              >= 4.9     && < 5,
-    monad-control     >= 0.3.2   && < 1.1,
-    MonadRandom       >= 0.1     && < 0.6,
     mtl               >= 2.0     && < 2.3,
-    mmorph            >= 1.0.0   && < 1.2,
     profunctors       >= 4       && < 6,
     semigroups        >= 0.8.3.1 && < 1,
-    semigroupoids     >= 4       && < 6,
-    transformers      >= 0.2     && < 0.6,
-    transformers-base >= 0.4     && < 0.5
+    semigroupoids     >= 4       && < 6
 
   extensions: CPP
-  exposed-modules: Control.Monad.Trans.Either
-                   Data.Either.Combinators
-                   Data.Either.Validation
+  exposed-modules:
+    Data.Either.Combinators
+    Data.Either.Validation
   ghc-options: -Wall
   hs-source-dirs: src
 
