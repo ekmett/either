@@ -29,6 +29,7 @@ module Control.Monad.Trans.Either
   , bracketEitherT_
   , left
   , right
+  , finallyE
   , swapEitherT
   , firstEitherT
   ) where
@@ -336,6 +337,21 @@ instance (Monad f, Traversable f) => Traversable (EitherT e f) where
   traverse f (EitherT a) =
     EitherT <$> traverse (either (pure . Left) (fmap Right . f)) a
   {-# INLINE traverse #-}
+
+-- | 'finallyE' acts on a short-circuiting value which is about to exit the
+--   'EitherT' transformer block, within the context it was generated in.
+--
+-- >>> runEitherT $ right 20 >> left 10 `finallyE` (return . (+1))
+-- Left 11
+--
+--   The cleanup function to 'finallyE' has the option of modifying the
+--   short-circuiting value as well.
+finallyE :: Monad m => EitherT e m a -> (e -> m e) -> EitherT e m a
+finallyE action cleanup = EitherT $ do
+    result <- runEitherT action
+    case result of
+        Left e  -> Left `liftM` cleanup e
+        Right _ -> return result
 
 instance MonadBase b m => MonadBase b (EitherT e m) where
   liftBase = liftBaseDefault
