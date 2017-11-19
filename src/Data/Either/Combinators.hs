@@ -33,6 +33,8 @@ module Data.Either.Combinators
   , unlessRight
   , leftToMaybe
   , rightToMaybe
+  , maybeToLeft
+  , maybeToRight
   , eitherToError
   , swapEither
   ) where
@@ -309,6 +311,27 @@ leftToMaybe = either Just (const Nothing)
 rightToMaybe :: Either a b -> Maybe b
 rightToMaybe = either (const Nothing) Just
 
+-- | Maybe produce a 'Left', otherwise produce a 'Right'.
+--
+-- >>> maybeToRight "default" (Just 12)
+-- Left 12
+--
+-- >>> maybeToRight "default" Nothing
+-- Right "default"
+maybeToLeft :: b -> Maybe a -> Either a b
+maybeToLeft _ (Just x) = Left x
+maybeToLeft y Nothing  = Right y
+
+-- | Maybe produce a 'Right', otherwise produce a 'Left'.
+--
+-- >>> maybeToRight "default" (Just 12)
+-- Right 12
+--
+-- >>> maybeToRight "default" Nothing
+-- Left "default"
+maybeToRight :: b -> Maybe a -> Either b a
+maybeToRight _ (Just x) = Right x
+maybeToRight y Nothing  = Left y
 
 -- | Generalize @Either e@ as @MonadError e m@.
 --
