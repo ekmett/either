@@ -1,3 +1,9 @@
+5
+-
+* Changed the semantics of the `Validation` `Alt` and `Alternative` instances to collect errors.
+  The previous implementation did not correctly abide the laws.
+* Added `vap`, for when users want validation like semantics but don't want to convert back and forth to validation all the time.
+
 4.5
 ----
 * Add `MMonad` instance for `EitherT`
