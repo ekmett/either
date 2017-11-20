@@ -2,7 +2,7 @@
 -
 * Changed the semantics of the `Validation` `Alt` and `Alternative` instances to collect errors.
   The previous implementation did not correctly abide the laws.
-* Added `vap`, for when users want validation like semantics but don't want to convert back and forth to validation all the time.
+* Added `vap`, for when users want validation like semantics but don't want to convert back and forth to validation all the time. Similarly, added `ealt` to give either's `Alt` semantics to validation.
 * Dropped the deprecated `Control.Monad.Trans.Either`.  Use `Control.Monad.Trans.Except` from `transformers` and/or
   `transformers-compat` instead.
 
