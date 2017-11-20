@@ -22,6 +22,7 @@ module Data.Either.Validation
   , validationToEither
   , _Validation
   , vap
+  , ealt
   ) where
 
 import Control.Applicative
@@ -152,3 +153,8 @@ vap (Left m) Right{} = Left m
 vap Right{} (Left n) = Left n
 vap (Right f) (Right a) = Right (f a)
 {-# INLINE vap #-}
+
+ealt :: Validation e a -> Validation e a -> Validation e a
+ealt Failure{} r = r
+ealt (Success a) _ = Success a
+{-# INLINE ealt #-}
