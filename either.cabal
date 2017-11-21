@@ -9,7 +9,7 @@ maintainer:    Edward A. Kmett <ekmett@gmail.com>
 stability:     provisional
 homepage:      http://github.com/ekmett/either/
 bug-reports:   http://github.com/ekmett/either/issues
-copyright:     Copyright (C) 2008-2014 Edward A. Kmett
+copyright:     Copyright (C) 2008-2017 Edward A. Kmett
 synopsis:      Combinators for working with sums
 description:   Combinators for working with sums.
 build-type:    Simple
@@ -43,7 +43,7 @@ library
     Data.Either.Validation
 
 test-suite tests
-  ghc-options: -Wall
+  ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
   type: exitcode-stdio-1.0
   main-is: Main.hs
   hs-source-dirs: tests
