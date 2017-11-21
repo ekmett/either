@@ -2,7 +2,7 @@ name:          either
 category:      Control, Monads
 version:       5
 license:       BSD3
-cabal-version: >= 1.8
+cabal-version: >= 1.10
 license-file:  LICENSE
 author:        Edward A. Kmett
 maintainer:    Edward A. Kmett <ekmett@gmail.com>
@@ -11,7 +11,7 @@ homepage:      http://github.com/ekmett/either/
 bug-reports:   http://github.com/ekmett/either/issues
 copyright:     Copyright (C) 2008-2014 Edward A. Kmett
 synopsis:      Combinators for working with sums
-description:   Combinators for working with sums
+description:   Combinators for working with sums.
 build-type:    Simple
 extra-source-files:
   .gitignore
@@ -34,7 +34,7 @@ library
     semigroups        >= 0.8.3.1 && < 1,
     semigroupoids     >= 4       && < 6
 
-  extensions: CPP
+  other-extensions: CPP Rank2Types
   ghc-options: -Wall
   hs-source-dirs: src
   default-language: Haskell2010
