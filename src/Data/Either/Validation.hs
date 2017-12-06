@@ -21,7 +21,7 @@ module Data.Either.Validation
   , eitherToValidation
   , validationToEither
   , _Validation
-  , vap
+  , vap, mvap
   , ealt
   ) where
 
@@ -89,17 +89,15 @@ instance Bitraversable Validation where
   bitraverse f _ (Failure e) = Failure <$> f e
 
 instance Semigroup e => Semigroup (Validation e a) where
+  x@Success{} <> _ = x
+  _ <> x@Success{} = x
   Failure e1 <> Failure e2 = Failure (e1 <> e2)
-  Failure _  <> Success a2 = Success a2
-  Success a1 <> Failure _  = Success a1
-  Success a1 <> Success _  = Success a1
 
 instance Monoid e => Monoid (Validation e a) where
   mempty = Failure mempty
+  x@Success{} `mappend` _ = x
+  _ `mappend` x@Success{} = x
   Failure e1 `mappend` Failure e2 = Failure (e1 `mappend` e2)
-  Failure _  `mappend` Success a2 = Success a2
-  Success a1 `mappend` Failure _  = Success a1
-  Success a1 `mappend` Success _  = Success a1
 
 type Prism s t a b = forall p f. (Choice p, Applicative f) => p a (f b) -> p s (f t)
 
@@ -149,11 +147,21 @@ _Validation = iso validationToEither eitherToValidation
 {-# INLINE _Validation #-}
 
 vap :: Semigroup m => Either m (a -> b) -> Either m a -> Either m b
-vap (Left m) (Left n) = Left (m <> n)
-vap (Left m) Right{} = Left m
+vap (Left m) b = Left $ case b of
+  Left n  -> m <> n
+  Right{} -> m
 vap Right{} (Left n) = Left n
 vap (Right f) (Right a) = Right (f a)
 {-# INLINE vap #-}
+
+-- lazier version of vap that can leak less, but which requires a Monoid
+mvap :: Monoid m => Either m (a -> b) -> Either m a -> Either m b
+mvap (Left m) b = Left $ m `mappend` case b of
+  Left n  -> n
+  Right{} -> mempty
+mvap Right{} (Left n) = Left n
+mvap (Right f) (Right a) = Right (f a)
+{-# INLINE mvap #-}
 
 ealt :: Validation e a -> Validation e a -> Validation e a
 ealt Failure{} r = r
