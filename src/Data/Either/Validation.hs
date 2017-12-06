@@ -21,8 +21,10 @@ module Data.Either.Validation
   , eitherToValidation
   , validationToEither
   , _Validation
-  , vap, mvap
+  , vap
   , ealt
+  -- combinators that leak less, but require monoid constraints
+  , vapm, apm
   ) where
 
 import Control.Applicative
@@ -154,14 +156,22 @@ vap Right{} (Left n) = Left n
 vap (Right f) (Right a) = Right (f a)
 {-# INLINE vap #-}
 
+apm :: Monoid m => Validation m (a -> b) -> Validation m a -> Validation m b
+apm (Failure m) b = Failure $ m `mappend` case b of
+  Failure n  -> n
+  Success{} -> mempty
+apm Success{} (Failure n) = Failure n
+apm (Success f) (Success a) = Success (f a)
+{-# INLINE apm #-}
+
 -- lazier version of vap that can leak less, but which requires a Monoid
-mvap :: Monoid m => Either m (a -> b) -> Either m a -> Either m b
-mvap (Left m) b = Left $ m `mappend` case b of
+vapm :: Monoid m => Either m (a -> b) -> Either m a -> Either m b
+vapm (Left m) b = Left $ m `mappend` case b of
   Left n  -> n
   Right{} -> mempty
-mvap Right{} (Left n) = Left n
-mvap (Right f) (Right a) = Right (f a)
-{-# INLINE mvap #-}
+vapm Right{} (Left n) = Left n
+vapm (Right f) (Right a) = Right (f a)
+{-# INLINE vapm #-}
 
 ealt :: Validation e a -> Validation e a -> Validation e a
 ealt Failure{} r = r
