@@ -49,10 +49,11 @@ instance Functor (Validation e) where
    fmap f (Success a) = Success (f a)
 
 instance Semigroup e => Apply (Validation e) where
-  Failure e1 <.> Failure e2 = Failure (e1 <> e2)
-  Failure e1 <.> Success _  = Failure e1
-  Success _  <.> Failure e2 = Failure e2
-  Success f  <.> Success a  = Success (f a)
+  Failure e1 <.> b = Failure $ case b of
+    Failure e2 -> e1 <> e2
+    Success _  -> e1
+  Success _  <.> Failure e  = Failure  e
+  Success f  <.> Success x  = Success (f x)
 
 instance Semigroup e => Applicative (Validation e) where
   pure = Success
