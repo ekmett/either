@@ -92,7 +92,7 @@ install:
       TEST=${TEST---enable-tests}
     else
       TEST=${TEST---disable-tests}
-    endif
+    fi
   - HADDOCK=${HADDOCK-true}
   - INSTALLED=${INSTALLED-true}
   - GHCHEAD=${GHCHEAD-false}
