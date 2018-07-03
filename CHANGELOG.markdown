@@ -1,3 +1,12 @@
+next [????.??.??]
+-----------------
+* Make the `Semigroup`, `Apply`, and `Applicative` instances for `Validation`
+  lazier.
+* Make `vap` lazier in its second argument.
+* Introduce `vapm`, an even lazier version of `vap` which requires a
+  `Monoid` constraint. Also add `apm`, a counterpart for `Validation`.
+* Use `test-framework` and `QuickCheck` in the test suite.
+
 5
 -
 * Changed the semantics of the `Validation` `Alt` and `Alternative` instances to collect errors.
