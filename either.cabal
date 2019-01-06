@@ -51,6 +51,7 @@ library
   exposed-modules:
     Data.Either.Combinators
     Data.Either.Validation
+    Data.Either.ValidationT
 
 test-suite tests
   ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
@@ -62,5 +63,7 @@ test-suite tests
     either,
     test-framework             >= 0.8.1.1 && < 0.9,
     test-framework-quickcheck2 >= 0.3.0.3 && < 0.4,
+    test-framework-hunit,
+    HUnit,
     QuickCheck                 >= 2.9     && < 2.13
   default-language: Haskell2010
