@@ -61,6 +61,7 @@ instance Semigroup e => Applicative (Validation e) where
   pure = Success
   (<*>) = (<.>)
 
+-- | For two errors, this instance reports both of them.
 instance Semigroup e => Alt (Validation e) where
   s@Success{} <!> _ = s
   _ <!> s@Success{} = s
