@@ -41,8 +41,10 @@ library
     bifunctors        >= 4       && < 6,
     mtl               >= 2.0     && < 2.3,
     profunctors       >= 4       && < 6,
-    semigroups        >= 0.8.3.1 && < 1,
     semigroupoids     >= 4       && < 6
+
+  if !impl(ghc >= 8.0)
+    build-depends: semigroups >= 0.8.3.1 && < 1
 
   other-extensions: CPP Rank2Types
   ghc-options: -Wall
