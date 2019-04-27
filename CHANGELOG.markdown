@@ -1,3 +1,7 @@
+Next [????.??.??]
+-----------------
+* Only incur a `semigroups` dependency on pre-8.0 GHCs.
+
 5.0.1 [2018.07.03]
 ------------------
 * Make the `Semigroup`, `Apply`, and `Applicative` instances for `Validation`
