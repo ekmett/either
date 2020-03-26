@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE Rank2Types #-}
 
 -----------------------------------------------------------------------------
@@ -34,11 +35,17 @@ import Data.Bitraversable(Bitraversable(bitraverse))
 import Data.Foldable (Foldable(foldr))
 import Data.Functor.Alt (Alt((<!>)))
 import Data.Functor.Apply (Apply ((<.>)))
-import Data.Monoid (Monoid(mappend, mempty))
 import Data.Profunctor
-import Data.Semigroup (Semigroup((<>)))
-import Data.Traversable (Traversable(traverse))
 import Prelude hiding (foldr)
+
+#if !(MIN_VERSION_base(4,8,0))
+import Data.Monoid (Monoid(mappend, mempty))
+import Data.Traversable (Traversable(traverse))
+#endif
+
+#if !(MIN_VERSION_base(4,11,0))
+import Data.Semigroup (Semigroup((<>)))
+#endif
 
 -- | 'Validation' is 'Either' with a Left that is a 'Monoid'
 data Validation e a
