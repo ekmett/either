@@ -313,7 +313,7 @@ rightToMaybe = either (const Nothing) Just
 
 -- | Maybe produce a 'Left', otherwise produce a 'Right'.
 --
--- >>> maybeTLeft "default" (Just 12)
+-- >>> maybeToLeft "default" (Just 12)
 -- Left 12
 --
 -- >>> maybeToLeft "default" Nothing
