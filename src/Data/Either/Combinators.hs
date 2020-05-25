@@ -313,10 +313,10 @@ rightToMaybe = either (const Nothing) Just
 
 -- | Maybe produce a 'Left', otherwise produce a 'Right'.
 --
--- >>> maybeToRight "default" (Just 12)
+-- >>> maybeToLeft "default" (Just 12)
 -- Left 12
 --
--- >>> maybeToRight "default" Nothing
+-- >>> maybeToLeft "default" Nothing
 -- Right "default"
 maybeToLeft :: b -> Maybe a -> Either a b
 maybeToLeft _ (Just x) = Left x
