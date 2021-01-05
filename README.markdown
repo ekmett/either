@@ -1,7 +1,7 @@
 either
 ======
 
-[![Hackage](https://img.shields.io/hackage/v/either.svg)](https://hackage.haskell.org/package/either) [![Build Status](https://secure.travis-ci.org/ekmett/either.png?branch=master)](http://travis-ci.org/ekmett/either)
+[![Hackage](https://img.shields.io/hackage/v/either.svg)](https://hackage.haskell.org/package/either) [![Build Status](https://github.com/ekmett/either/workflows/Haskell-CI/badge.svg)](https://github.com/ekmett/either/actions?query=workflow%3AHaskell-CI)
 
 Contact Information
 -------------------

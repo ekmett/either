@@ -29,7 +29,6 @@ extra-source-files:
   .gitignore
   .ghci
   .vim.custom
-  .travis.yml
   CHANGELOG.markdown
   README.markdown
 
