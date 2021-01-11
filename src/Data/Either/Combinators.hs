@@ -342,13 +342,11 @@ eitherToError = either throwError return
 
 -- | Swap the 'Left' and 'Right' sides of an 'Either'.
 --
--- @
 -- >>> swapEither (Right 3)
 -- Left 3
 --
 -- >>> swapEither (Left "error")
 -- Right "error"
--- @
 swapEither :: Either e a -> Either a e
 swapEither = either Right Left
 {-# INLINE swapEither #-}
