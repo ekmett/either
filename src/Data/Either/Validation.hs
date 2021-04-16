@@ -105,9 +105,11 @@ instance Semigroup e => Semigroup (Validation e a) where
 
 instance Monoid e => Monoid (Validation e a) where
   mempty = Failure mempty
+#if !(MIN_VERSION_base(4,11,0))
   x@Success{} `mappend` _ = x
   _ `mappend` x@Success{} = x
   Failure e1 `mappend` Failure e2 = Failure (e1 `mappend` e2)
+#endif
 
 type Prism s t a b = forall p f. (Choice p, Applicative f) => p a (f b) -> p s (f t)
 
