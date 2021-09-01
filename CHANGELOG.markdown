@@ -1,3 +1,7 @@
+5.0.1.2 [2021.09.01]
+--------------------
+* Tweak error messages of `fromRight'` and `fromLeft'` for clarity.
+
 5.0.1.1 [2019.05.02]
 --------------------
 * Only incur a `semigroups` dependency on pre-8.0 GHCs.
