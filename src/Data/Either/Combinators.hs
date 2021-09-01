@@ -93,7 +93,7 @@ isRight _         = False
 -- >>> fromLeft' (Left 12)
 -- 12
 fromLeft' :: Either a b -> a
-fromLeft' (Right _) = error "Data.Either.Combinators.fromLeft: Argument takes form 'Right _'" -- yuck
+fromLeft' (Right _) = error "Data.Either.Combinators.fromLeft' encountered a value of form 'Right _', consider using Data.Either.Combinators.fromLeft with a default value." -- yuck
 fromLeft' (Left x)  = x
 
 -- | Extracts the element out of a 'Right' and
@@ -108,7 +108,7 @@ fromLeft' (Left x)  = x
 -- >>> fromRight' (Right 12)
 -- 12
 fromRight' :: Either a b -> b
-fromRight' (Left _)  = error "Data.Either.Combinators.fromRight: Argument takes form 'Left _'" -- yuck
+fromRight' (Left _)  = error "Data.Either.Combinators.fromRight' encountered a value of form 'Left _', consider using Data.Either.Combinators.fromRight with a default value." -- yuck
 fromRight' (Right x) = x
 
 -- | The 'mapBoth' function takes two functions and applies the first if iff the value
