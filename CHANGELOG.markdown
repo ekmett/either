@@ -1,6 +1,7 @@
 next [????.??.??]
---------------------
+-----------------
 * Tweak error messages of `fromRight'` and `fromLeft'` for clarity.
+* Allow building with `mtl-2.3.*`.
 
 5.0.1.1 [2019.05.02]
 --------------------
