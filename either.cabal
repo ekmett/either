@@ -43,7 +43,7 @@ library
     bifunctors        >= 4       && < 6,
     mtl               >= 2.0     && < 2.4,
     profunctors       >= 4       && < 6,
-    semigroupoids     >= 4       && < 6
+    semigroupoids     >= 4       && < 7
 
   if !impl(ghc >= 8.0)
     build-depends: semigroups >= 0.8.3.1 && < 1
