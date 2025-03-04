@@ -38,11 +38,6 @@ import Data.Functor.Apply (Apply ((<.>)))
 import Data.Profunctor
 import Prelude hiding (foldr)
 
-#if !(MIN_VERSION_base(4,8,0))
-import Data.Monoid (Monoid(mappend, mempty))
-import Data.Traversable (Traversable(traverse))
-#endif
-
 #if !(MIN_VERSION_base(4,11,0))
 import Data.Semigroup (Semigroup((<>)))
 #endif
