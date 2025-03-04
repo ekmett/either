@@ -7,12 +7,13 @@ import Data.Either.Validation
 import Data.Monoid (Sum(..))
 
 import Test.QuickCheck (Property, Gen, (===), (.&&.), Arbitrary (..), forAllShrink, oneof)
-import Test.Framework (defaultMain)
-import Test.Framework.Providers.QuickCheck2 (testProperty)
+import Test.Tasty (defaultMain, testGroup)
+import Test.Tasty.QuickCheck (testProperty)
 
 
 main :: IO ()
-main = defaultMain
+main = defaultMain $
+  testGroup "either"
     [ testProperty "identity" $ identity (<|>) empty genValSumInt shrinkValidation
     , testProperty "associativity" $ associativity (<|>) genValSumInt shrinkValidation
     ]
