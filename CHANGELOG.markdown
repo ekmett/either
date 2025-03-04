@@ -1,3 +1,7 @@
+next [????.??.??]
+-----------------
+* Replace `test-framework` with `tasty` in the test suite.
+
 5.0.2 [2022.05.07]
 ------------------
 * Tweak error messages of `fromRight'` and `fromLeft'` for clarity.
