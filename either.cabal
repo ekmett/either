@@ -1,6 +1,6 @@
 name:          either
 category:      Control, Monads
-version:       5.0.2
+version:       5.0.3
 license:       BSD3
 cabal-version: >= 1.10
 license-file:  LICENSE

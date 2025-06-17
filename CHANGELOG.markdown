@@ -1,5 +1,5 @@
-next [????.??.??]
------------------
+5.0.3 [2025.06.17]
+------------------
 * Replace `test-framework` with `tasty` in the test suite.
 * Drop support for pre-8.0 versions of GHC.
 
