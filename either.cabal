@@ -63,5 +63,5 @@ test-suite tests
     either,
     tasty            >= 1.4  && < 1.6,
     tasty-quickcheck >= 0.10 && < 0.12,
-    QuickCheck       >= 2.9  && < 2.19
+    QuickCheck       >= 2.9  && < 2.20
   default-language: Haskell2010
